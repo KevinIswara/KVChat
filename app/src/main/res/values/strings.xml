@@ -8,4 +8,7 @@
     <string name="forgot_password">Forgot Password?</string>
     <string name="btn_login">Log in</string>
     <string name="register">Don\'t have an account? Register here</string>
+    <string name="title_signup">Sign Up</string>
+    <string name="btn_signup">Sign Up</string>
+    <string name="have_an_account">Already have an account? Login here</string>
 </resources>
