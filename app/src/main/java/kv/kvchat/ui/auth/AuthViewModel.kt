@@ -1,5 +1,7 @@
 package kv.kvchat.ui.auth
 
+import android.content.Intent
+import android.view.View
 import androidx.lifecycle.ViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -67,17 +69,17 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
         disposables.add(disposable)
     }
 
-//    fun goToSignup(view: View) {
-//        Intent(view.context, SignupActivity::class.java).also {
-//            view.context.startActivity(it)
-//        }
-//    }
-//
-//    fun goToLogin(view: View) {
-//        Intent(view.context, LoginActivity::class.java).also {
-//            view.context.startActivity(it)
-//        }
-//    }
+    fun goToSignup(view: View) {
+        Intent(view.context, SignupActivity::class.java).also {
+            view.context.startActivity(it)
+        }
+    }
+
+    fun goToLogin(view: View) {
+        Intent(view.context, LoginActivity::class.java).also {
+            view.context.startActivity(it)
+        }
+    }
 
 
     //disposing the disposables

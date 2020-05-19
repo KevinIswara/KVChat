@@ -91,11 +91,11 @@
                 android:drawableStart="@drawable/ic_lock_green_24dp"
                 android:drawablePadding="10dp"
                 android:hint="@string/hint_password"
-                android:inputType="textEmailAddress"
+                android:inputType="textPassword"
                 android:singleLine="true"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_password_title"
-                android:text="@={viewmodel.email}" />
+                android:text="@={viewmodel.password}" />
 
             <TextView
                 android:id="@+id/tv_forget_password"

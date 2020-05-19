@@ -91,18 +91,18 @@
                 android:drawableStart="@drawable/ic_lock_green_24dp"
                 android:drawablePadding="10dp"
                 android:hint="@string/hint_password"
-                android:inputType="textEmailAddress"
+                android:inputType="textPassword"
                 android:singleLine="true"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_password_title"
-                android:text="@={viewmodel.email}" />
+                android:text="@={viewmodel.password}" />
 
             <Button
                 android:id="@+id/btn_login"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="22dp"
-                android:onClick="@{() -> viewmodel.login()}"
+                android:onClick="@{() -> viewmodel.signup()}"
                 android:text="@string/btn_signup"
                 style="@style/OrangeButton"
                 app:layout_constraintTop_toBottomOf="@id/et_password"/>
