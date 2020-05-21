@@ -10,5 +10,6 @@
     <string name="register">Don\'t have an account? Register here</string>
     <string name="title_signup">Sign Up</string>
     <string name="btn_signup">Sign Up</string>
+    <string name="ok_caps">OK</string>
     <string name="have_an_account">Already have an account? Login here</string>
 </resources>

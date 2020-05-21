@@ -3,6 +3,8 @@ package kv.kvchat.ui.auth
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
@@ -41,7 +43,12 @@ class SignupActivity() : AppCompatActivity(), AuthListener, KodeinAware {
 
     override fun onFailure(message: String) {
         binding.progressbar.visibility = View.GONE
-        // TODO make an error dialog
-        Log.d("signupactivity", "error message: $message")
+        val alertDialogBuilder: AlertDialog.Builder = AlertDialog.Builder(this)
+        alertDialogBuilder.setMessage(message)
+            .setPositiveButton(this.resources.getString(R.string.ok_caps)) { dialog, _ ->
+                dialog.dismiss()
+            }
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
     }
 }
