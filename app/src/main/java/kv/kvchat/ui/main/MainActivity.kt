@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             .fallback(R.drawable.ic_account_circle_green_24dp)
 
         Glide.with(this).load("https://i.picsum.photos/id/1/300/300.jpg")
-            .setdefaultrequestoption(options)
+            .apply(options)
             .into(binding.toolbar.ivToolbar)
     }
 }
