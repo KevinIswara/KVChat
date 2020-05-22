@@ -1,10 +1,14 @@
 package kv.kvchat.data.firebase
 
+import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import io.reactivex.Completable
+import kv.kvchat.data.auth.User
 
 class FirebaseSource {
+
+    var user: MutableLiveData<User> = MutableLiveData()
 
     private val firebaseAuth: FirebaseAuth by lazy {
         FirebaseAuth.getInstance()
@@ -31,18 +35,13 @@ class FirebaseSource {
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
             if (!emitter.isDisposed) {
                 if (it.isSuccessful) {
-                    val userId = currentUser()?.uid
-                    userId?.let { userId ->
-                        val reference = firebaseDatabase.getReference("Users").child(userId)
                         val map: HashMap<String, String> = hashMapOf("username" to username, "name" to name, "imageUrl" to "default")
 
-                        reference.setValue(map).addOnCompleteListener{ task ->
+                        userReference()?.setValue(map)?.addOnCompleteListener{ task ->
                             if (task.isSuccessful) {
                                 emitter.onComplete()
                             }
                         }
-                    }
-
                 } else
                     emitter.onError(it.exception!!)
             }
@@ -53,4 +52,27 @@ class FirebaseSource {
 
     fun currentUser() = firebaseAuth.currentUser
 
+    private fun userReference(): DatabaseReference? {
+        val userId = currentUser()?.uid
+        userId?.let {
+            return firebaseDatabase.getReference("Users").child(it)
+        }
+        return null
+    }
+
+    fun getUserData(): MutableLiveData<User> {
+        userReference()?.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    val userData = dataSnapshot.getValue(User::class.java)
+                    user.postValue(userData)
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+        })
+        return user
+    }
 }

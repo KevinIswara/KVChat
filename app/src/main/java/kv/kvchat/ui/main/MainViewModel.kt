@@ -5,5 +5,5 @@ import kv.kvchat.data.auth.UserRepository
 
 class MainViewModel(private val repository: UserRepository): ViewModel() {
 
-    var name = "kevin"
+    fun getUserData() = repository.getUserData()
 }
