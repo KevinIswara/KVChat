@@ -11,6 +11,8 @@ import kv.kvchat.data.auth.UserRepository
 class AuthViewModel(private val repository: UserRepository): ViewModel() {
 
     //email and password for the input
+    var username: String? = null
+    var name: String? = null
     var email: String? = null
     var password: String? = null
 
@@ -29,8 +31,11 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
     fun login() {
 
         //validating email and password
-        if (email.isNullOrEmpty() || password.isNullOrEmpty()) {
-            authListener?.onFailure("Invalid email or password")
+        if (email.isNullOrEmpty()) {
+            authListener?.onFailure("Email is required")
+            return
+        } else if (password.isNullOrEmpty()) {
+            authListener?.onFailure("Password is required")
             return
         }
 
@@ -53,12 +58,27 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
 
     //Doing same thing with signup
     fun signup() {
-        if (email.isNullOrEmpty() || password.isNullOrEmpty()) {
-            authListener?.onFailure("Please input all values")
-            return
+        when {
+            username.isNullOrEmpty() -> {
+                authListener?.onFailure("Username is required")
+                return
+            }
+            name.isNullOrEmpty() -> {
+                authListener?.onFailure("Name is required")
+                return
+            }
+            email.isNullOrEmpty() -> {
+                authListener?.onFailure("Email is required")
+                return
+            }
+            password.isNullOrEmpty() -> {
+                authListener?.onFailure("Password is required")
+                return
+            }
+            password!!.length < 6 -> authListener?.onFailure("Password must be at least 6 characters")
         }
         authListener?.onStarted()
-        val disposable = repository.register(email!!, password!!)
+        val disposable = repository.register(username!!, name!!, email!!, password!!)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({

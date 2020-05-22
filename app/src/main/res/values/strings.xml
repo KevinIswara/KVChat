@@ -12,4 +12,8 @@
     <string name="btn_signup">Sign Up</string>
     <string name="ok_caps">OK</string>
     <string name="have_an_account">Already have an account? Login here</string>
+    <string name="username_title">username</string>
+    <string name="hint_username">Username</string>
+    <string name="name_title">name</string>
+    <string name="hint_name">Name</string>
 </resources>
