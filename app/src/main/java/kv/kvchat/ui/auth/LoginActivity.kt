@@ -1,5 +1,6 @@
 package kv.kvchat.ui.auth
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import kv.kvchat.R
 import kv.kvchat.databinding.ActivityLoginBinding
+import kv.kvchat.ui.main.MainActivity
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
@@ -56,7 +58,9 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
     override fun onStart() {
         super.onStart()
         viewModel.user?.let {
-            Log.d("loginactivity", "go to chat activity")
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+//            Log.d("loginactivity", "go to chat activity")
         }
     }
 }

@@ -4,6 +4,7 @@ import android.app.Application
 import kv.kvchat.data.auth.UserRepository
 import kv.kvchat.data.firebase.FirebaseSource
 import kv.kvchat.ui.auth.AuthViewModelFactory
+import kv.kvchat.ui.main.MainViewModelFactory
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.androidXModule
@@ -20,5 +21,6 @@ class ChatApplication : Application(), KodeinAware {
         bind() from singleton { FirebaseSource() }
         bind() from singleton { UserRepository(instance()) }
         bind() from provider { AuthViewModelFactory(instance()) }
+        bind() from provider { MainViewModelFactory(instance()) }
     }
 }

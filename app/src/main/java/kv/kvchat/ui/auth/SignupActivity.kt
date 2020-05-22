@@ -29,6 +29,8 @@ class SignupActivity() : AppCompatActivity(), AuthListener, KodeinAware {
         viewModel = ViewModelProviders.of(this, factory).get(AuthViewModel::class.java)
         binding.viewmodel = viewModel
 
+        supportActionBar?.setTitle(R.string.app_name)
+
         viewModel.authListener = this
     }
 
