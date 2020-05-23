@@ -2,11 +2,14 @@ package kv.kvchat.ui.main
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.tabs.TabLayout
 import kv.kvchat.R
 import kv.kvchat.data.auth.User
 import kv.kvchat.databinding.ActivityMainBinding
@@ -27,11 +30,12 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         viewModel = ViewModelProviders.of(this, factory).get(MainViewModel::class.java)
         binding.viewmodel = viewModel
+        binding.handler = this
+        binding.manager = supportFragmentManager
 
         setSupportActionBar(binding.toolbar.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -55,4 +59,15 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             .apply(options)
             .into(binding.toolbar.ivToolbar)
     }
+}
+
+@BindingAdapter("bind:handler")
+fun bindViewPagerAdapter(view: ViewPager, activity: MainActivity) {
+    val adapter = MainAdapter(view.context, activity.supportFragmentManager)
+    view.adapter = adapter
+}
+
+@BindingAdapter("bind:pager")
+fun bindViewPagerTabs(view: TabLayout, pagerView: ViewPager) {
+    view.setupWithViewPager(pagerView, true)
 }
