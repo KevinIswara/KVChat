@@ -40,7 +40,10 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         setSupportActionBar(binding.toolbar.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        viewModel.getUserData().observe(this, Observer { userData ->
+        binding.lifecycleOwner = this
+
+        viewModel.getUserData()
+        viewModel.getUser().observe(this, Observer { userData ->
             user = userData
             setToolbar()
         })

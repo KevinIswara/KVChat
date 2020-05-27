@@ -18,7 +18,7 @@ class MainAdapter(context: Context, fm: FragmentManager): FragmentPagerAdapter(f
         return when (TABS[position]) {
             FRIENDS -> FriendsFragment.newInstance()
             CHAT -> FriendsFragment.newInstance()
-            PROFILE -> FriendsFragment.newInstance()
+            PROFILE -> ProfileFragment.newInstance()
             else -> FriendsFragment.newInstance()
         }
     }
