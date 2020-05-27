@@ -1,13 +1,14 @@
 package kv.kvchat.ui.main
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
-import kv.kvchat.R
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import kv.kvchat.databinding.FriendsFragmentBinding
 
 class FriendsFragment : Fragment() {
 
@@ -17,17 +18,25 @@ class FriendsFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
 
+    private  val friendsAdapter = FriendsAdapter()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.friends_fragment, container, false)
-    }
+    ): View?  {
+        val binding = FriendsFragmentBinding.inflate(inflater, container, false)
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+        binding.rvFriends.apply {
+            adapter = friendsAdapter
+            layoutManager = LinearLayoutManager(context)
+            setHasFixedSize(true)
+        }
+
         viewModel = ViewModelProviders.of(activity!!).get(MainViewModel::class.java)
-        // TODO: Use the ViewModel
+        viewModel.friends.observe(this, Observer { list ->
+            friendsAdapter.updateData(list)
+        })
+        return binding.root
     }
 
 }
