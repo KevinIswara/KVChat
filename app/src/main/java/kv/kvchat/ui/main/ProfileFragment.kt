@@ -10,10 +10,13 @@ import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.webkit.MimeTypeMap
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -75,13 +78,16 @@ class ProfileFragment : Fragment() {
 
             binding.tvName.text = userData.name
             binding.tvUsename.text = "Username: ${userData.username}"
-            binding.ivEditProfilePicture.setOnClickListener {
-                pickImage()
-            }
         })
+        binding.ivEditProfilePicture.setOnClickListener {
+            pickImage()
+        }
+        binding.ivEditName.setOnClickListener {
+            editName()
+        }
     }
 
-    fun setLogout() {
+    private fun setLogout() {
         binding.btnLogout.setOnClickListener {
             viewModel.logout()
             val i = Intent(this.context, LoginActivity::class.java)
@@ -90,7 +96,7 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    fun pickImage() {
+    private fun pickImage() {
         val getIntent = Intent(Intent.ACTION_GET_CONTENT)
         getIntent.type = "image/*"
 
@@ -106,7 +112,7 @@ class ProfileFragment : Fragment() {
         startActivityForResult(chooserIntent, IMAGE_REQUEST)
     }
 
-    fun getFileExtension(uri: Uri): String? {
+    private fun getFileExtension(uri: Uri): String? {
         val contentResolver = context?.contentResolver
         val mimeTypeMap = MimeTypeMap.getSingleton()
         return mimeTypeMap.getExtensionFromMimeType(contentResolver?.getType(uri))
@@ -140,7 +146,7 @@ class ProfileFragment : Fragment() {
 
     private fun setUploadImageResponse() {
         viewModel.getImageUpdateResponse().observe(viewLifecycleOwner, Observer { response ->
-            response.status?.let {
+            response.status.let {
 
             }
             if (response.status == FirebaseSource.IMAGE_UPLOAD_SUCCESS) {
@@ -177,7 +183,44 @@ class ProfileFragment : Fragment() {
                 viewModel.uploadProfilePicture(it)
             }
         }
+    }
 
+    private fun editName() {
+        binding.etName.setText(binding.tvName.text)
+        binding.etName.visibility = View.VISIBLE
+        binding.tvName.visibility = View.INVISIBLE
+        binding.etName.setOnEditorActionListener(object : TextView.OnEditorActionListener {
+            override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    binding.etName.visibility = View.GONE
+                    binding.tvName.visibility = View.VISIBLE
+                    binding.etName.text.toString().let {
+                        if (it.isBlank()) {
+                            dialog.setTitle("Failed")
+                                .setMessage("Name cannot be blank")
+                        } else if (isNetworkConnected()) {
+                            viewModel.changeName(it)
+                            binding.tvName.text = binding.etName.text.toString()
+                            dialog.setTitle("Success")
+                                .setMessage("Name has been changed!")
+                        } else {
+                            dialog.setTitle("Failed")
+                                .setMessage("You are not connected to the internet!")
+                        }
+                        dialog.setCancelable(false)
+                            .setPositiveButton(
+                                "OK"
+                            ) { dialog, _ ->
+                                dialog.dismiss()
+                            }
+                        dialog.show()
+                    }
+                    return true
+                }
+                return false
+            }
+
+        })
     }
 
     private fun isNetworkConnected(): Boolean {

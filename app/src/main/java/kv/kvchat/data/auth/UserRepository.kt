@@ -18,6 +18,8 @@ class UserRepository(private val firebase: FirebaseSource) {
     fun uploadImage(imageUri: Uri, fileExtension: String) = firebase.uploadImage(imageUri, fileExtension)
 
     fun getImageUpdateResponse() = firebase.getImageUpdateResponse()
+
+    fun changeName(name: String) = firebase.changeName(name)
   
     fun getFriends() = firebase.getFriendList()
 }

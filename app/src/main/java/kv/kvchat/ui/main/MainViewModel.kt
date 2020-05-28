@@ -34,6 +34,10 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
         }
     }
 
+    fun changeName(name: String) {
+        repository.changeName(name)
+    }
+
     fun getUser(): MutableLiveData<User> {
         return user
     }
