@@ -13,4 +13,6 @@ class UserRepository(private val firebase: FirebaseSource) {
     fun getUserData() = firebase.getUserData()
 
     fun logout() = firebase.logout()
+
+    fun getFriends() = firebase.getFriendList()
 }
