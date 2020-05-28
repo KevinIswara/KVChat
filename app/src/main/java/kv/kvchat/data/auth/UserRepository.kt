@@ -1,5 +1,6 @@
 package kv.kvchat.data.auth
 
+import android.net.Uri
 import kv.kvchat.data.firebase.FirebaseSource
 
 class UserRepository(private val firebase: FirebaseSource) {
@@ -13,4 +14,8 @@ class UserRepository(private val firebase: FirebaseSource) {
     fun getUserData() = firebase.getUserData()
 
     fun logout() = firebase.logout()
+
+    fun uploadImage(imageUri: Uri, fileExtension: String) = firebase.uploadImage(imageUri, fileExtension)
+
+    fun getImageUpdateResponse() = firebase.getImageUpdateResponse()
 }
