@@ -1,7 +1,6 @@
 package kv.kvchat.data.firebase
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
@@ -99,7 +98,6 @@ class FirebaseSource {
             if (task.isSuccessful) {
                 val downloadUri = task.result
                 addProfilePictureToDB(downloadUri.toString())
-                getUserData()
                 val response = NetworkingResponse(status = IMAGE_UPLOAD_SUCCESS)
                 imageUploadResponse.postValue(response)
             } else {
@@ -119,6 +117,12 @@ class FirebaseSource {
     private fun addProfilePictureToDB(downloadUri: String) {
         val data = HashMap<String, Any>()
         data["imageUrl"] = downloadUri
+        userReference()?.updateChildren(data)
+    }
+
+    fun changeName(name: String) {
+        val data = HashMap<String, Any>()
+        data["name"] = name
         userReference()?.updateChildren(data)
     }
 
