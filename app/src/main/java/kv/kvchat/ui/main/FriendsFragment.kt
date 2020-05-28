@@ -18,7 +18,13 @@ class FriendsFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
 
-    private  val friendsAdapter = FriendsAdapter()
+    private lateinit var friendsAdapter: FriendsAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        friendsAdapter = FriendsAdapter(context!!)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,5 +44,4 @@ class FriendsFragment : Fragment() {
         })
         return binding.root
     }
-
 }

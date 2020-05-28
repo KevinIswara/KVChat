@@ -6,13 +6,17 @@ import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.google.firebase.storage.*
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import io.reactivex.Completable
 import kv.kvchat.data.auth.User
 
 class FirebaseSource {
 
     var user: MutableLiveData<User> = MutableLiveData()
+
+    var chatUser: MutableLiveData<User> = MutableLiveData()
 
     var friends: MutableLiveData<ArrayList<User>> = MutableLiveData()
   
@@ -53,7 +57,7 @@ class FirebaseSource {
                 if (it.isSuccessful) {
                         val map: HashMap<String, String> = hashMapOf("username" to username, "name" to name, "imageUrl" to "default")
 
-                        userReference()?.setValue(map)?.addOnCompleteListener{ task ->
+                        currUserReference()?.setValue(map)?.addOnCompleteListener{ task ->
                             if (task.isSuccessful) {
                                 emitter.onComplete()
                             }
@@ -68,13 +72,14 @@ class FirebaseSource {
 
     fun currentUser() = firebaseAuth.currentUser
 
-    private fun userReference(): DatabaseReference? {
+    private fun currUserReference(): DatabaseReference? {
         val userId = currentUser()?.uid
         userId?.let {
             return firebaseDatabase.getReference("Users").child(it)
         }
         return null
     }
+    private fun userReference(): DatabaseReference? = firebaseDatabase.getReference("Users")
 
     private fun storageReference(): StorageReference? {
         return firebaseStorage.getReference("uploads")
@@ -117,13 +122,13 @@ class FirebaseSource {
     private fun addProfilePictureToDB(downloadUri: String) {
         val data = HashMap<String, Any>()
         data["imageUrl"] = downloadUri
-        userReference()?.updateChildren(data)
+        currUserReference()?.updateChildren(data)
     }
 
     fun changeName(name: String) {
         val data = HashMap<String, Any>()
         data["name"] = name
-        userReference()?.updateChildren(data)
+        currUserReference()?.updateChildren(data)
     }
 
     fun getImageUpdateResponse(): MutableLiveData<NetworkingResponse> {
@@ -131,7 +136,7 @@ class FirebaseSource {
     }
 
     fun getUserData(): MutableLiveData<User> {
-        userReference()?.addValueEventListener(object : ValueEventListener {
+        currUserReference()?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
                     val userData = dataSnapshot.getValue(User::class.java)
@@ -145,13 +150,31 @@ class FirebaseSource {
         })
         return user
     }
-  
+
+    fun getFriendData(username: String): MutableLiveData<User> {
+        val ref = userReference()?.orderByChild("username")?.equalTo(username)
+
+        ref?.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (snapshot in dataSnapshot.children) {
+                    val userData = snapshot.getValue(User::class.java)
+                    chatUser.postValue(userData)
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+        })
+        return chatUser
+    }
+
     fun getFriendList(): MutableLiveData<ArrayList<User>> {
         val reference = firebaseDatabase.getReference("Users")
-        val friendList : ArrayList<User> = ArrayList()
 
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val friendList : ArrayList<User> = ArrayList()
                 for (snapshot in dataSnapshot.children) {
                     val userItem = snapshot.getValue(User::class.java)
                     userItem?.let {

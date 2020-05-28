@@ -22,4 +22,6 @@ class UserRepository(private val firebase: FirebaseSource) {
     fun changeName(name: String) = firebase.changeName(name)
   
     fun getFriends() = firebase.getFriendList()
+
+    fun getFriendData(username: String) = firebase.getFriendData(username)
 }

@@ -1,5 +1,7 @@
 package kv.kvchat.ui.main
 
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -9,8 +11,9 @@ import com.bumptech.glide.request.RequestOptions
 import kv.kvchat.R
 import kv.kvchat.data.auth.User
 import kv.kvchat.databinding.FriendItemBinding
+import kv.kvchat.ui.chat.ChatActivity
 
-class FriendsAdapter: RecyclerView.Adapter<FriendsAdapter.FriendsViewHolder>() {
+class FriendsAdapter(val context: Context): RecyclerView.Adapter<FriendsAdapter.FriendsViewHolder>() {
     private var items: MutableList<User> = mutableListOf()
 
     fun updateData(items: List<User>?) {
@@ -19,14 +22,6 @@ class FriendsAdapter: RecyclerView.Adapter<FriendsAdapter.FriendsViewHolder>() {
             this.items.addAll(it)
         }
         notifyDataSetChanged()
-    }
-
-    fun getItems(): List<User>? = this.items
-
-    fun clearItems() {
-        val count = itemCount
-        this.items.clear()
-        notifyItemRangeRemoved(0, count)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendsViewHolder {
@@ -38,9 +33,15 @@ class FriendsAdapter: RecyclerView.Adapter<FriendsAdapter.FriendsViewHolder>() {
 
     override fun onBindViewHolder(holder: FriendsViewHolder, position: Int) = with(holder) {
         bindView(items[position])
+
+        holder.itemBinding.root.setOnClickListener {
+            val intent = Intent(context, ChatActivity::class.java)
+            intent.putExtra("username", items[position].username)
+            context.startActivity(intent)
+        }
     }
 
-    inner class FriendsViewHolder(private val itemBinding: FriendItemBinding) : RecyclerView.ViewHolder(itemBinding.root) {
+    inner class FriendsViewHolder(val itemBinding: FriendItemBinding) : RecyclerView.ViewHolder(itemBinding.root) {
         fun bindView(item: User) = with(itemView) {
             val options = RequestOptions()
                 .circleCrop()
