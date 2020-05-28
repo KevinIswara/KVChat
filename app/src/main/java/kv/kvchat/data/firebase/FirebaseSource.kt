@@ -15,6 +15,8 @@ class FirebaseSource {
 
     var user: MutableLiveData<User> = MutableLiveData()
 
+    var friends: MutableLiveData<ArrayList<User>> = MutableLiveData()
+  
     var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
 
     companion object {
@@ -138,6 +140,31 @@ class FirebaseSource {
             }
         })
         return user
+    }
+  
+    fun getFriendList(): MutableLiveData<ArrayList<User>> {
+        val reference = firebaseDatabase.getReference("Users")
+        val friendList : ArrayList<User> = ArrayList()
+
+        reference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (snapshot in dataSnapshot.children) {
+                    val userItem = snapshot.getValue(User::class.java)
+                    userItem?.let {
+                        if (!snapshot.key.equals(currentUser()?.uid)) {
+                            friendList.add(it)
+                        }
+                    }
+                }
+                friends.postValue(friendList)
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+        })
+
+        return friends
     }
 }
 

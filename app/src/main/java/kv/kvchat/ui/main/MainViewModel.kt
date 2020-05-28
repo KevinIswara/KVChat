@@ -11,6 +11,8 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
 
     private var user: MutableLiveData<User> = MutableLiveData()
 
+    val friends : MutableLiveData<ArrayList<User>> = repository.getFriends()
+
     private var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
 
     var imageUri: Uri? = null
@@ -21,10 +23,8 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
         imageUploadResponse = repository.getImageUpdateResponse()
         getUserData()
     }
-
-    fun getUserData() {
-        user = repository.getUserData()
-    }
+    
+    fun getUserData() = repository.getUserData()
 
     fun logout() {
         repository.logout()
