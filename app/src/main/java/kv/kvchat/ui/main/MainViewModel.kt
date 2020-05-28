@@ -21,10 +21,8 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
 
     fun init() {
         imageUploadResponse = repository.getImageUpdateResponse()
-        getUserData()
+        user = repository.getUserData()
     }
-    
-    fun getUserData() = repository.getUserData()
 
     fun logout() {
         repository.logout()
