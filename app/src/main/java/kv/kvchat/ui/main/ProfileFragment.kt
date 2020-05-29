@@ -34,7 +34,7 @@ class ProfileFragment : Fragment() {
 
     companion object {
         fun newInstance() = ProfileFragment()
-        val IMAGE_REQUEST = 1
+        const val IMAGE_REQUEST = 1
     }
 
     private lateinit var viewModel: MainViewModel
@@ -77,7 +77,7 @@ class ProfileFragment : Fragment() {
                 .into(binding.ivProfilePicure)
 
             binding.tvName.text = userData.name
-            binding.tvUsename.text = "Username: ${userData.username}"
+            binding.tvUsername.text = "Username: ${userData.username}"
         })
         binding.ivEditProfilePicture.setOnClickListener {
             pickImage()
@@ -146,27 +146,20 @@ class ProfileFragment : Fragment() {
 
     private fun setUploadImageResponse() {
         viewModel.getImageUpdateResponse().observe(viewLifecycleOwner, Observer { response ->
-            response.status.let {
-
-            }
-            if (response.status == FirebaseSource.IMAGE_UPLOAD_SUCCESS) {
+            if (response.status != 0) {
                 pd.dismiss()
-                dialog.setTitle("Success")
-                    .setMessage("Profile picture has been changed!")
-                    .setCancelable(false)
-                    .setPositiveButton(
-                        "OK"
-                    ) { dialog, _ ->
-                        dialog.dismiss()
+                if (response.status == FirebaseSource.IMAGE_UPLOAD_SUCCESS) {
+                    dialog.setTitle("Success")
+                        .setMessage("Profile picture has been changed!")
+                } else if (response.status == FirebaseSource.IMAGE_UPLOAD_FAILED) {
+                    pd.dismiss()
+                    response.message?.let {
+                        dialog.setMessage(it)
                     }
-                dialog.show()
-            } else if (response.status == FirebaseSource.IMAGE_UPLOAD_FAILED) {
-                pd.dismiss()
-                response.message?.let {
-                    dialog.setMessage(it)
+                    dialog.setTitle(response.title)
                 }
-                dialog.setTitle(response.title)
-                    .setCancelable(false)
+                viewModel.setStatus(0)
+                dialog.setCancelable(false)
                     .setPositiveButton(
                         "OK"
                     ) { dialog, _ ->

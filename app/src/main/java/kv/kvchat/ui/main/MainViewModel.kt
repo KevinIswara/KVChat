@@ -45,4 +45,8 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
     fun getImageUpdateResponse(): MutableLiveData<NetworkingResponse> {
         return imageUploadResponse
     }
+
+    fun setStatus(status: Int) {
+        imageUploadResponse.value?.status = status
+    }
 }
