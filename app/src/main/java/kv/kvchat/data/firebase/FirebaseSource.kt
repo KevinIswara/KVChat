@@ -19,8 +19,8 @@ class FirebaseSource {
     var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
 
     companion object {
-        val IMAGE_UPLOAD_SUCCESS = 11
-        val IMAGE_UPLOAD_FAILED = 10
+        const val IMAGE_UPLOAD_SUCCESS = 11
+        const val IMAGE_UPLOAD_FAILED = 10
     }
 
     private val firebaseAuth: FirebaseAuth by lazy {
