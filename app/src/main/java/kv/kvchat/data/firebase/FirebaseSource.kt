@@ -10,7 +10,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import io.reactivex.Completable
-import kv.kvchat.data.auth.User
+import kv.kvchat.data.model.User
 
 class FirebaseSource {
 
@@ -79,7 +79,10 @@ class FirebaseSource {
         }
         return null
     }
+
     private fun userReference(): DatabaseReference? = firebaseDatabase.getReference("Users")
+
+    private fun chatReference(): DatabaseReference? = firebaseDatabase.getReference("Chats")
 
     private fun storageReference(): StorageReference? {
         return firebaseStorage.getReference("uploads")
@@ -192,6 +195,13 @@ class FirebaseSource {
         })
 
         return friends
+    }
+
+    fun sendMessage(sender: String, receiver: String, message: String) {
+        val map: HashMap<String, String> = hashMapOf("sender" to sender, "receiver" to receiver,
+            "message" to message)
+
+        chatReference()?.push()?.setValue(map)
     }
 }
 

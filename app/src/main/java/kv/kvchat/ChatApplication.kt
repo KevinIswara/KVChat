@@ -1,8 +1,9 @@
 package kv.kvchat
 
 import android.app.Application
-import kv.kvchat.data.auth.UserRepository
+import kv.kvchat.data.repository.UserRepository
 import kv.kvchat.data.firebase.FirebaseSource
+import kv.kvchat.data.repository.ChatRepository
 import kv.kvchat.ui.auth.AuthViewModelFactory
 import kv.kvchat.ui.chat.ChatViewModelFactory
 import kv.kvchat.ui.main.MainViewModelFactory
@@ -21,8 +22,9 @@ class ChatApplication : Application(), KodeinAware {
 
         bind() from singleton { FirebaseSource() }
         bind() from singleton { UserRepository(instance()) }
+        bind() from singleton { ChatRepository(instance()) }
         bind() from provider { AuthViewModelFactory(instance()) }
         bind() from provider { MainViewModelFactory(instance()) }
-        bind() from provider { ChatViewModelFactory(instance()) }
+        bind() from provider { ChatViewModelFactory(instance(), instance()) }
     }
 }

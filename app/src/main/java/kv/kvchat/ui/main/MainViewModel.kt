@@ -3,8 +3,8 @@ package kv.kvchat.ui.main
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kv.kvchat.data.auth.User
-import kv.kvchat.data.auth.UserRepository
+import kv.kvchat.data.model.User
+import kv.kvchat.data.repository.UserRepository
 import kv.kvchat.data.firebase.NetworkingResponse
 
 class MainViewModel(private val repository: UserRepository) : ViewModel() {

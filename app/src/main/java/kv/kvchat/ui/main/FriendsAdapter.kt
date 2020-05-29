@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kv.kvchat.R
-import kv.kvchat.data.auth.User
+import kv.kvchat.data.model.User
 import kv.kvchat.databinding.FriendItemBinding
 import kv.kvchat.ui.chat.ChatActivity
 

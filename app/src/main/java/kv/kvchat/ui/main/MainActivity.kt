@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.tabs.TabLayout
 import kv.kvchat.R
-import kv.kvchat.data.auth.User
+import kv.kvchat.data.model.User
 import kv.kvchat.databinding.ActivityMainBinding
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein

@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kv.kvchat.data.auth.UserRepository
+import kv.kvchat.data.repository.UserRepository
 
 class AuthViewModel(private val repository: UserRepository): ViewModel() {
 

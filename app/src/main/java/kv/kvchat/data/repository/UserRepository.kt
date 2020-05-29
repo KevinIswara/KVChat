@@ -1,4 +1,4 @@
-package kv.kvchat.data.auth
+package kv.kvchat.data.repository
 
 import android.net.Uri
 import kv.kvchat.data.firebase.FirebaseSource
