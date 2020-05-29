@@ -17,12 +17,12 @@ import org.kodein.di.generic.instance
 class ChatActivity : AppCompatActivity(), KodeinAware {
 
     override val kodein by kodein()
-    private val factory : ChatViewModelFactory by instance()
+    private val factory: ChatViewModelFactory by instance()
 
     private lateinit var viewModel: ChatViewModel
     private lateinit var binding: ActivityChatBinding
 
-    private lateinit var user: User
+    private lateinit var friend: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +31,8 @@ class ChatActivity : AppCompatActivity(), KodeinAware {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chat)
         viewModel = ViewModelProviders.of(this, factory).get(ChatViewModel::class.java)
         binding.viewmodel = viewModel
+        binding.lifecycleOwner = this
+
 
         setSupportActionBar(binding.toolbar.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -41,14 +43,14 @@ class ChatActivity : AppCompatActivity(), KodeinAware {
 
         val username = intent.getStringExtra("username")
         viewModel.getFriendData(username)
-        viewModel.userData.observe(this, Observer { userData ->
-            user = userData
+        viewModel.friendData.observe(this, Observer { friendData ->
+            friend = friendData
             setToolbar()
         })
     }
 
     fun setToolbar() {
-        binding.toolbar.tvTitle.text = user.name
+        binding.toolbar.tvTitle.text = friend.name
 
         val options = RequestOptions()
             .circleCrop()
@@ -56,7 +58,7 @@ class ChatActivity : AppCompatActivity(), KodeinAware {
             .error(R.drawable.ic_account_circle_white_30dp)
             .fallback(R.drawable.ic_account_circle_white_30dp)
 
-        Glide.with(this).load(user.imageUrl)
+        Glide.with(this).load(friend.imageUrl)
             .apply(options)
             .into(binding.toolbar.ivToolbar)
     }
