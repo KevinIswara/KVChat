@@ -10,6 +10,7 @@ import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.tabs.TabLayout
+import kv.kvchat.ChatApplication
 import kv.kvchat.R
 import kv.kvchat.data.model.User
 import kv.kvchat.databinding.ActivityMainBinding
@@ -21,7 +22,7 @@ import org.kodein.di.generic.instance
 class MainActivity : AppCompatActivity(), KodeinAware {
 
     override val kodein by kodein()
-    private val factory : MainViewModelFactory by instance()
+    private val factory: MainViewModelFactory by instance()
 
     private lateinit var viewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         viewModel.init()
         viewModel.getUser().observe(this, Observer { userData ->
             user = userData
+            ChatApplication.setUser(userData)
             setToolbar()
         })
     }

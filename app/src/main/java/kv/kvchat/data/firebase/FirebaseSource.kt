@@ -10,6 +10,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import io.reactivex.Completable
+import kv.kvchat.data.model.Chat
 import kv.kvchat.data.model.User
 
 class FirebaseSource {
@@ -19,7 +20,9 @@ class FirebaseSource {
     var chatUser: MutableLiveData<User> = MutableLiveData()
 
     var friends: MutableLiveData<ArrayList<User>> = MutableLiveData()
-  
+
+    var chats: MutableLiveData<ArrayList<Chat>> = MutableLiveData()
+
     var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
 
     companion object {
@@ -44,29 +47,33 @@ class FirebaseSource {
             if (!emitter.isDisposed) {
                 if (it.isSuccessful)
                     emitter.onComplete()
-
                 else
                     emitter.onError(it.exception!!)
             }
         }
     }
 
-    fun register(username: String, name: String, email: String, password: String) = Completable.create { emitter ->
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
-            if (!emitter.isDisposed) {
-                if (it.isSuccessful) {
-                        val map: HashMap<String, String> = hashMapOf("username" to username, "name" to name, "imageUrl" to "default")
+    fun register(username: String, name: String, email: String, password: String) =
+        Completable.create { emitter ->
+            firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
+                if (!emitter.isDisposed) {
+                    if (it.isSuccessful) {
+                        val map: HashMap<String, String> = hashMapOf(
+                            "username" to username,
+                            "name" to name,
+                            "imageUrl" to "default"
+                        )
 
-                        currUserReference()?.setValue(map)?.addOnCompleteListener{ task ->
+                        currUserReference()?.setValue(map)?.addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 emitter.onComplete()
                             }
                         }
-                } else
-                    emitter.onError(it.exception!!)
+                    } else
+                        emitter.onError(it.exception!!)
+                }
             }
         }
-    }
 
     fun logout() = firebaseAuth.signOut()
 
@@ -88,9 +95,11 @@ class FirebaseSource {
         return firebaseStorage.getReference("uploads")
     }
 
-    fun uploadImage(filePath: Uri, fileExtension: String){
-        val ref = storageReference()?.child("uploads/" +
-                System.currentTimeMillis().toString() + "." + fileExtension)
+    fun uploadImage(filePath: Uri, fileExtension: String) {
+        val ref = storageReference()?.child(
+            "uploads/" +
+                    System.currentTimeMillis().toString() + "." + fileExtension
+        )
         val uploadTask = ref?.putFile(filePath)
         var response = NetworkingResponse()
 
@@ -114,7 +123,7 @@ class FirebaseSource {
                 response.message = "Profile picture has not been changed!"
                 imageUploadResponse.postValue(response)
             }
-        }?.addOnFailureListener{ e ->
+        }?.addOnFailureListener { e ->
             response.status = IMAGE_UPLOAD_FAILED
             response.title = "Failed"
             response.message = e.message
@@ -177,7 +186,7 @@ class FirebaseSource {
 
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val friendList : ArrayList<User> = ArrayList()
+                val friendList: ArrayList<User> = ArrayList()
                 for (snapshot in dataSnapshot.children) {
                     val userItem = snapshot.getValue(User::class.java)
                     userItem?.let {
@@ -198,13 +207,42 @@ class FirebaseSource {
     }
 
     fun sendMessage(sender: String, receiver: String, message: String) {
-        val map: HashMap<String, String> = hashMapOf("sender" to sender, "receiver" to receiver,
-            "message" to message)
+        val map: HashMap<String, String> = hashMapOf(
+            "sender" to sender, "receiver" to receiver,
+            "message" to message
+        )
 
         chatReference()?.push()?.setValue(map)
     }
+
+    fun readMessage(myUsername: String, friendUsername: String): MutableLiveData<ArrayList<Chat>> {
+
+        chatReference()?.addValueEventListener(object : ValueEventListener {
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val chatList: ArrayList<Chat> = ArrayList()
+                for (snapshot in dataSnapshot.children) {
+                    val chatItem = snapshot.getValue(Chat::class.java)
+                    chatItem?.let {
+                        if ((it.sender == myUsername && it.receiver == friendUsername)
+                            || it.receiver == myUsername && it.sender == friendUsername) {
+                            chatList.add(it)
+                        }
+                    }
+                }
+                chats.postValue(chatList)
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+        })
+        return chats
+    }
 }
 
-data class NetworkingResponse(var status: Int = 0,
-                              var message: String? = null,
-                              var title: String? = null)
+data class NetworkingResponse(
+    var status: Int = 0,
+    var message: String? = null,
+    var title: String? = null
+)

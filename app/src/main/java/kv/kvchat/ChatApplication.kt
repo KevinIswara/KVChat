@@ -3,6 +3,7 @@ package kv.kvchat
 import android.app.Application
 import kv.kvchat.data.repository.UserRepository
 import kv.kvchat.data.firebase.FirebaseSource
+import kv.kvchat.data.model.User
 import kv.kvchat.data.repository.ChatRepository
 import kv.kvchat.ui.auth.AuthViewModelFactory
 import kv.kvchat.ui.chat.ChatViewModelFactory
@@ -16,6 +17,18 @@ import org.kodein.di.generic.provider
 import org.kodein.di.generic.singleton
 
 class ChatApplication : Application(), KodeinAware {
+
+    companion object {
+        private var currUser = User()
+
+        fun setUser(user: User) {
+            currUser = user
+        }
+
+        fun getUser(): User {
+            return currUser
+        }
+    }
 
     override val kodein = Kodein.lazy {
         import(androidXModule(this@ChatApplication))
