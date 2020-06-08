@@ -18,4 +18,6 @@
     <string name="hint_name">Name</string>
     <string name="profile_title">User Profile</string>
     <string name="logout">Logout</string>
+    <string name="hint_search">Search...</string>
+    <string name="error_friendsnotfound">Friends not found......sad :(</string>
 </resources>
