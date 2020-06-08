@@ -2,11 +2,11 @@ package kv.kvchat.ui.chat
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kv.kvchat.ChatApplication
 import kv.kvchat.data.model.Chat
 import kv.kvchat.data.model.User
 import kv.kvchat.data.repository.ChatRepository
 import kv.kvchat.data.repository.UserRepository
-
 
 class ChatViewModel(
     private val userRepository: UserRepository,
@@ -14,7 +14,6 @@ class ChatViewModel(
 ) : ViewModel() {
 
     private var friendData: MutableLiveData<User> = MutableLiveData()
-    private var userData: MutableLiveData<User> = userRepository.getUserData()
     private var chats: MutableLiveData<ArrayList<Chat>> = MutableLiveData()
 
     var msgText: MutableLiveData<String> = MutableLiveData()
@@ -38,15 +37,13 @@ class ChatViewModel(
     fun getChatData(username: String, friendUsername: String) {
         if (username.isNotBlank() && friendUsername.isNotBlank()) {
             chats = chatRepository.readMessage(username, friendUsername)
-        } else {
-
         }
     }
 
     fun sendMessage() {
-        if (msgText.value != "" && userData.value != null && friendData.value != null) {
+        if (msgText.value != "" && friendData.value != null) {
             chatRepository.sendMessage(
-                userData.value?.username.toString(),
+                ChatApplication.getUser().username.toString(),
                 friendData.value?.username.toString(), msgText.value ?: ""
             )
         }

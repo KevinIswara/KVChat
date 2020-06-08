@@ -37,7 +37,7 @@ class ChatApplication : Application(), KodeinAware {
         bind() from singleton { UserRepository(instance()) }
         bind() from singleton { ChatRepository(instance()) }
         bind() from provider { AuthViewModelFactory(instance()) }
-        bind() from provider { MainViewModelFactory(instance()) }
+        bind() from provider { MainViewModelFactory(instance(), instance()) }
         bind() from provider { ChatViewModelFactory(instance(), instance()) }
     }
 }

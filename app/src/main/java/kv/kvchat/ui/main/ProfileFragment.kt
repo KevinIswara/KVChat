@@ -24,11 +24,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import kv.kvchat.ChatApplication
 import kv.kvchat.R
 import kv.kvchat.data.firebase.FirebaseSource
 import kv.kvchat.databinding.FragmentProfileBinding
 import kv.kvchat.ui.auth.LoginActivity
-
 
 class ProfileFragment : Fragment() {
 
@@ -64,21 +64,21 @@ class ProfileFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     fun setProfile() {
-        viewModel.getUser().observe(viewLifecycleOwner, Observer { userData ->
+        val userData = ChatApplication.getUser()
 
-            val options = RequestOptions()
-                .circleCrop()
-                .placeholder(R.drawable.ic_account_circle_black_100dp)
-                .error(R.drawable.ic_account_circle_black_100dp)
-                .fallback(R.drawable.ic_account_circle_black_100dp)
+        val options = RequestOptions()
+            .circleCrop()
+            .placeholder(R.drawable.ic_account_circle_black_100dp)
+            .error(R.drawable.ic_account_circle_black_100dp)
+            .fallback(R.drawable.ic_account_circle_black_100dp)
 
-            Glide.with(this).load(userData.imageUrl)
-                .apply(options)
-                .into(binding.ivProfilePicure)
+        Glide.with(this).load(userData.imageUrl)
+            .apply(options)
+            .into(binding.ivProfilePicure)
 
-            binding.tvName.text = userData.name
-            binding.tvUsername.text = "Username: ${userData.username}"
-        })
+        binding.tvName.text = userData.name
+        binding.tvUsername.text = "Username: ${userData.username}"
+
         binding.ivEditProfilePicture.setOnClickListener {
             pickImage()
         }
