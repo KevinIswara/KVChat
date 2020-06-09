@@ -2,10 +2,12 @@ package kv.kvchat.ui.auth
 
 import android.content.Intent
 import android.view.View
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kv.kvchat.data.firebase.NetworkingResponse
 import kv.kvchat.data.repository.UserRepository
 
 class AuthViewModel(private val repository: UserRepository) : ViewModel() {
@@ -119,7 +121,13 @@ class AuthViewModel(private val repository: UserRepository) : ViewModel() {
         disposables.add(disposable)
     }
 
-    fun getUserDataResponse() = userDataResponse
+    fun getUserDataResponse(): MutableLiveData<NetworkingResponse> {
+        return userDataResponse
+    }
+
+    fun setStatus(status: Int) {
+        userDataResponse.value?.status = status
+    }
 
     //disposing the disposables
     override fun onCleared() {
