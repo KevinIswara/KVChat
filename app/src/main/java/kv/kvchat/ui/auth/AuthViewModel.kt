@@ -6,9 +6,14 @@ import androidx.lifecycle.ViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kv.kvchat.data.auth.UserRepository
+import kv.kvchat.data.repository.UserRepository
 
-class AuthViewModel(private val repository: UserRepository): ViewModel() {
+class AuthViewModel(private val repository: UserRepository) : ViewModel() {
+
+    companion object {
+        const val LOGIN_SUCCESS = 101
+        const val SIGNUP_SUCCESS = 102
+    }
 
     //email and password for the input
     var username: String? = null
@@ -19,13 +24,14 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
     //auth listener
     var authListener: AuthListener? = null
 
-
     //disposable to dispose the Completable
     private val disposables = CompositeDisposable()
 
     val user by lazy {
         repository.currentUser()
     }
+
+    private var userDataResponse = repository.getUserDataResponse()
 
     //function to perform login
     fun login() {
@@ -48,7 +54,7 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 //sending a success callback
-                authListener?.onSuccess()
+                authListener?.onSuccess(LOGIN_SUCCESS)
             }, {
                 //sending a failure callback
                 authListener?.onFailure(it.message!!)
@@ -82,7 +88,7 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                authListener?.onSuccess()
+                authListener?.onSuccess(SIGNUP_SUCCESS)
             }, {
                 authListener?.onFailure(it.message!!)
             })
@@ -101,6 +107,13 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
         }
     }
 
+    fun getUserData() {
+        authListener?.onStarted()
+        val disposable = repository.getUserData()
+        disposables.add(disposable)
+    }
+
+    fun getUserDataResponse() = userDataResponse
 
     //disposing the disposables
     override fun onCleared() {

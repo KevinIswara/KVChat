@@ -4,29 +4,25 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.tabs.TabLayout
+import kv.kvchat.ChatApplication
 import kv.kvchat.R
-import kv.kvchat.data.auth.User
 import kv.kvchat.databinding.ActivityMainBinding
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
-
 class MainActivity : AppCompatActivity(), KodeinAware {
 
     override val kodein by kodein()
-    private val factory : MainViewModelFactory by instance()
+    private val factory: MainViewModelFactory by instance()
 
     private lateinit var viewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
-
-    private lateinit var user: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,14 +38,11 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
         binding.lifecycleOwner = this
         viewModel.init()
-        viewModel.getUser().observe(this, Observer { userData ->
-            user = userData
-            setToolbar()
-        })
+        setToolbar()
     }
 
-    fun setToolbar() {
-        binding.toolbar.tvTitle.text = user.name
+    private fun setToolbar() {
+        binding.toolbar.tvTitle.text = ChatApplication.getUser().name
 
         val options = RequestOptions()
             .circleCrop()
@@ -57,7 +50,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             .error(R.drawable.ic_account_circle_white_30dp)
             .fallback(R.drawable.ic_account_circle_white_30dp)
 
-        Glide.with(this).load(user.imageUrl)
+        Glide.with(this).load(ChatApplication.getUser().imageUrl)
             .apply(options)
             .into(binding.toolbar.ivToolbar)
     }

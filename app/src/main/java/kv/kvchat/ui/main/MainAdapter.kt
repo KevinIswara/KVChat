@@ -5,19 +5,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 
-class MainAdapter(context: Context, fm: FragmentManager): FragmentPagerAdapter(fm) {
-    private val FRIENDS = 0
-    private val CHAT = 1
+class MainAdapter(context: Context, fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    private val CHATS = 0
+    private val FRIENDS = 1
     private val PROFILE = 2
 
-    private val TABS = intArrayOf(FRIENDS, CHAT, PROFILE)
+    private val TABS = intArrayOf(FRIENDS, CHATS, PROFILE)
 
     private val mContext: Context = context.applicationContext
 
     override fun getItem(position: Int): Fragment {
         return when (TABS[position]) {
             FRIENDS -> FriendsFragment.newInstance()
-            CHAT -> FriendsFragment.newInstance()
+            CHATS -> ChatsFragment.newInstance()
             PROFILE -> ProfileFragment.newInstance()
             else -> FriendsFragment.newInstance()
         }
@@ -30,7 +30,7 @@ class MainAdapter(context: Context, fm: FragmentManager): FragmentPagerAdapter(f
     override fun getPageTitle(position: Int): CharSequence? {
         when (TABS[position]) {
             FRIENDS -> return "Friends"
-            CHAT -> return "Chat"
+            CHATS -> return "Chats"
             PROFILE -> return "Profile"
         }
         return null

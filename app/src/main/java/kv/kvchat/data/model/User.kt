@@ -1,4 +1,4 @@
-package kv.kvchat.data.auth
+package kv.kvchat.data.model
 
 data class User(
     var username: String? = "",
