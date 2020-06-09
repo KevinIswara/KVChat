@@ -6,6 +6,7 @@ import kv.kvchat.data.firebase.FirebaseSource
 import kv.kvchat.data.model.User
 import kv.kvchat.data.repository.ChatRepository
 import kv.kvchat.ui.auth.AuthViewModelFactory
+import kv.kvchat.ui.auth.ResetPasswordViewModelFactory
 import kv.kvchat.ui.chat.ChatViewModelFactory
 import kv.kvchat.ui.main.MainViewModelFactory
 import org.kodein.di.Kodein
@@ -37,6 +38,7 @@ class ChatApplication : Application(), KodeinAware {
         bind() from singleton { UserRepository(instance()) }
         bind() from singleton { ChatRepository(instance()) }
         bind() from provider { AuthViewModelFactory(instance()) }
+        bind() from provider { ResetPasswordViewModelFactory(instance()) }
         bind() from provider { MainViewModelFactory(instance(), instance()) }
         bind() from provider { ChatViewModelFactory(instance(), instance()) }
     }

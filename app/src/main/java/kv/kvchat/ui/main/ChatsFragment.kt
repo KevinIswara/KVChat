@@ -45,7 +45,7 @@ class ChatsFragment : Fragment() {
         viewModel.getChatFriendsFromFirebase(ChatApplication.getUser().username ?: "")
 
         viewModel.getChatFriends().observe(this, Observer { list ->
-            friendsAdapter.updateData(list)
+            friendsAdapter.updateData(list, "")
         })
 
         return binding.root

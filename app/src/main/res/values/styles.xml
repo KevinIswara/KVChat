@@ -28,6 +28,10 @@
         <item name="android:textColor">#fff</item>
     </style>
 
+    <style name="BlackTitleText" parent="TitleText">
+        <item name="android:textColor">#000</item>
+    </style>
+
     <style name="BlackNormalText" parent="NormalText">
         <item name="android:textColor">#000</item>
     </style>

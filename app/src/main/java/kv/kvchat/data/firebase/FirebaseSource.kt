@@ -25,20 +25,23 @@ class FirebaseSource {
     var chatUser: MutableLiveData<User> = MutableLiveData()
 
     var friends: MutableLiveData<ArrayList<User>> = MutableLiveData()
-
     var chats: MutableLiveData<ArrayList<Chat>> = MutableLiveData()
 
     var chatFriends: MutableLiveData<ArrayList<User>> = MutableLiveData()
 
-    var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
-
     var userDataResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
+
+    private var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
+
+    private var resetPasswordResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
 
     companion object {
         const val IMAGE_UPLOAD_SUCCESS = 11
         const val IMAGE_UPLOAD_FAILED = 10
         const val USER_DATA_SUCCESS = 21
         const val USER_DATA_FAILED = 20
+        const val RESET_PASSWORD_SUCCESS = 31
+        const val RESET_PASSWORD_FAILED = 30
     }
 
     private val firebaseAuth: FirebaseAuth by lazy {
@@ -74,7 +77,6 @@ class FirebaseSource {
                             "name" to name,
                             "imageUrl" to "default"
                         )
-
                         currUserReference()?.setValue(map)?.addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 emitter.onComplete()
@@ -214,6 +216,26 @@ class FirebaseSource {
         })
 
         return friends
+    }
+
+    fun resetPassword(email: String) {
+        var response = NetworkingResponse()
+        firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                response.status = RESET_PASSWORD_SUCCESS
+                response.title = "Success!"
+                response.message = "Please check your email!"
+            } else {
+                response.status = RESET_PASSWORD_FAILED
+                response.title = "Failed!"
+                response.message = task.exception?.message
+            }
+            resetPasswordResponse.postValue(response)
+        }
+    }
+
+    fun getResetPasswordResponse(): MutableLiveData<NetworkingResponse> {
+        return resetPasswordResponse
     }
 
     fun sendMessage(sender: String, receiver: String, message: String) {

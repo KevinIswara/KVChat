@@ -53,12 +53,12 @@ class FriendsAdapter(val context: Context): RecyclerView.Adapter<FriendsAdapter.
 
         holder.itemBinding.root.setOnClickListener {
             val intent = Intent(context, ChatActivity::class.java)
-            intent.putExtra("username", items[position].username)
+            intent.putExtra("username", items[position]?.username)
             context.startActivity(intent)
         }
     }
 
-    inner class FriendsViewHolder(private val itemBinding: FriendItemBinding) :
+    inner class FriendsViewHolder(val itemBinding: FriendItemBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
         fun bindView(item: User?) = with(itemView) {
             if (item != null) {
