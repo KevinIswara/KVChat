@@ -101,6 +101,12 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
         }
     }
 
+    fun goToResetPassword(view: View) {
+        Intent(view.context, ResetPasswordActivity::class.java).also {
+            view.context.startActivity(it)
+        }
+    }
+
 
     //disposing the disposables
     override fun onCleared() {

@@ -15,12 +15,16 @@ class FirebaseSource {
     var user: MutableLiveData<User> = MutableLiveData()
 
     var friends: MutableLiveData<ArrayList<User>> = MutableLiveData()
-  
-    var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
+
+    private var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
+
+    private var resetPasswordResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
 
     companion object {
         const val IMAGE_UPLOAD_SUCCESS = 11
         const val IMAGE_UPLOAD_FAILED = 10
+        const val RESET_PASSWORD_SUCCESS = 21
+        const val RESET_PASSWORD_FAILED = 20
     }
 
     private val firebaseAuth: FirebaseAuth by lazy {
@@ -40,29 +44,33 @@ class FirebaseSource {
             if (!emitter.isDisposed) {
                 if (it.isSuccessful)
                     emitter.onComplete()
-
                 else
                     emitter.onError(it.exception!!)
             }
         }
     }
 
-    fun register(username: String, name: String, email: String, password: String) = Completable.create { emitter ->
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
-            if (!emitter.isDisposed) {
-                if (it.isSuccessful) {
-                        val map: HashMap<String, String> = hashMapOf("username" to username, "name" to name, "imageUrl" to "default")
+    fun register(username: String, name: String, email: String, password: String) =
+        Completable.create { emitter ->
+            firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
+                if (!emitter.isDisposed) {
+                    if (it.isSuccessful) {
+                        val map: HashMap<String, String> = hashMapOf(
+                            "username" to username,
+                            "name" to name,
+                            "imageUrl" to "default"
+                        )
 
-                        userReference()?.setValue(map)?.addOnCompleteListener{ task ->
+                        userReference()?.setValue(map)?.addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 emitter.onComplete()
                             }
                         }
-                } else
-                    emitter.onError(it.exception!!)
+                    } else
+                        emitter.onError(it.exception!!)
+                }
             }
         }
-    }
 
     fun logout() = firebaseAuth.signOut()
 
@@ -80,9 +88,11 @@ class FirebaseSource {
         return firebaseStorage.getReference("uploads")
     }
 
-    fun uploadImage(filePath: Uri, fileExtension: String){
-        val ref = storageReference()?.child("uploads/" +
-                System.currentTimeMillis().toString() + "." + fileExtension)
+    fun uploadImage(filePath: Uri, fileExtension: String) {
+        val ref = storageReference()?.child(
+            "uploads/" +
+                    System.currentTimeMillis().toString() + "." + fileExtension
+        )
         val uploadTask = ref?.putFile(filePath)
         var response = NetworkingResponse()
 
@@ -106,7 +116,7 @@ class FirebaseSource {
                 response.message = "Profile picture has not been changed!"
                 imageUploadResponse.postValue(response)
             }
-        }?.addOnFailureListener{ e ->
+        }?.addOnFailureListener { e ->
             response.status = IMAGE_UPLOAD_FAILED
             response.title = "Failed"
             response.message = e.message
@@ -145,10 +155,10 @@ class FirebaseSource {
         })
         return user
     }
-  
+
     fun getFriendList(): MutableLiveData<ArrayList<User>> {
         val reference = firebaseDatabase.getReference("Users")
-        val friendList : ArrayList<User> = ArrayList()
+        val friendList: ArrayList<User> = ArrayList()
 
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -170,8 +180,30 @@ class FirebaseSource {
 
         return friends
     }
+
+    fun resetPassword(email: String) {
+        var response = NetworkingResponse()
+        firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                response.status = RESET_PASSWORD_SUCCESS
+                response.title = "Success!"
+                response.message = "Please check your email!"
+            } else {
+                response.status = RESET_PASSWORD_FAILED
+                response.title = "Failed!"
+                response.message = task.exception?.message
+            }
+            resetPasswordResponse.postValue(response)
+        }
+    }
+
+    fun getResetPasswordResponse(): MutableLiveData<NetworkingResponse> {
+        return resetPasswordResponse
+    }
 }
 
-data class NetworkingResponse(var status: Int = 0,
-                              var message: String? = null,
-                              var title: String? = null)
+data class NetworkingResponse(
+    var status: Int = 0,
+    var message: String? = null,
+    var title: String? = null
+)

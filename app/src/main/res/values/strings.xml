@@ -18,4 +18,7 @@
     <string name="hint_name">Name</string>
     <string name="profile_title">User Profile</string>
     <string name="logout">Logout</string>
+    <string name="btn_reset">Reset</string>
+    <string name="info_resetpassword">By clicking RESET, you will receive an email to reset your password</string>
+    <string name="title_resetpassword">Reset Password</string>
 </resources>
