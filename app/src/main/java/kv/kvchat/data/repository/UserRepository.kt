@@ -1,4 +1,4 @@
-package kv.kvchat.data.auth
+package kv.kvchat.data.repository
 
 import android.net.Uri
 import kv.kvchat.data.firebase.FirebaseSource
@@ -21,6 +21,8 @@ class UserRepository(private val firebase: FirebaseSource) {
 
     fun getImageUpdateResponse() = firebase.getImageUpdateResponse()
 
+    fun getUserDataResponse() = firebase.userDataResponse
+
     fun changeName(name: String) = firebase.changeName(name)
 
     fun getFriends() = firebase.getFriendList()
@@ -28,4 +30,6 @@ class UserRepository(private val firebase: FirebaseSource) {
     fun resetPassword(email: String) = firebase.resetPassword(email)
 
     fun getPasswordResetResponse() = firebase.getResetPasswordResponse()
+
+    fun getFriendData(username: String) = firebase.getFriendData(username)
 }

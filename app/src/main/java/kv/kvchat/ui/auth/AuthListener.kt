@@ -2,6 +2,6 @@ package kv.kvchat.ui.auth
 
 interface AuthListener {
     fun onStarted()
-    fun onSuccess()
+    fun onSuccess(code: Int)
     fun onFailure(message: String)
 }

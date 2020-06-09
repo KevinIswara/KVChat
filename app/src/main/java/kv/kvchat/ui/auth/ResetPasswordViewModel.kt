@@ -2,9 +2,9 @@ package kv.kvchat.ui.auth
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kv.kvchat.data.auth.UserRepository
 import kv.kvchat.data.firebase.FirebaseSource
 import kv.kvchat.data.firebase.NetworkingResponse
+import kv.kvchat.data.repository.UserRepository
 
 class ResetPasswordViewModel(private val repository: UserRepository) : ViewModel() {
 

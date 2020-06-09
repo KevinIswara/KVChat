@@ -6,15 +6,30 @@ import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.google.firebase.storage.*
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
+import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Completable
-import kv.kvchat.data.auth.User
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import kv.kvchat.ChatApplication
+import kv.kvchat.data.model.Chat
+import kv.kvchat.data.model.User
 
 class FirebaseSource {
 
     var user: MutableLiveData<User> = MutableLiveData()
 
+    var chatUser: MutableLiveData<User> = MutableLiveData()
+
     var friends: MutableLiveData<ArrayList<User>> = MutableLiveData()
+    var chats: MutableLiveData<ArrayList<Chat>> = MutableLiveData()
+
+    var chatFriends: MutableLiveData<ArrayList<User>> = MutableLiveData()
+
+    var userDataResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
 
     private var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
 
@@ -23,8 +38,10 @@ class FirebaseSource {
     companion object {
         const val IMAGE_UPLOAD_SUCCESS = 11
         const val IMAGE_UPLOAD_FAILED = 10
-        const val RESET_PASSWORD_SUCCESS = 21
-        const val RESET_PASSWORD_FAILED = 20
+        const val USER_DATA_SUCCESS = 21
+        const val USER_DATA_FAILED = 20
+        const val RESET_PASSWORD_SUCCESS = 31
+        const val RESET_PASSWORD_FAILED = 30
     }
 
     private val firebaseAuth: FirebaseAuth by lazy {
@@ -60,8 +77,7 @@ class FirebaseSource {
                             "name" to name,
                             "imageUrl" to "default"
                         )
-
-                        userReference()?.setValue(map)?.addOnCompleteListener { task ->
+                        currUserReference()?.setValue(map)?.addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 emitter.onComplete()
                             }
@@ -76,13 +92,17 @@ class FirebaseSource {
 
     fun currentUser() = firebaseAuth.currentUser
 
-    private fun userReference(): DatabaseReference? {
+    private fun currUserReference(): DatabaseReference? {
         val userId = currentUser()?.uid
         userId?.let {
             return firebaseDatabase.getReference("Users").child(it)
         }
         return null
     }
+
+    private fun userReference(): DatabaseReference? = firebaseDatabase.getReference("Users")
+
+    private fun chatReference(): DatabaseReference? = firebaseDatabase.getReference("Chats")
 
     private fun storageReference(): StorageReference? {
         return firebaseStorage.getReference("uploads")
@@ -127,25 +147,42 @@ class FirebaseSource {
     private fun addProfilePictureToDB(downloadUri: String) {
         val data = HashMap<String, Any>()
         data["imageUrl"] = downloadUri
-        userReference()?.updateChildren(data)
+        currUserReference()?.updateChildren(data)
     }
 
     fun changeName(name: String) {
         val data = HashMap<String, Any>()
         data["name"] = name
-        userReference()?.updateChildren(data)
+        currUserReference()?.updateChildren(data)
     }
 
     fun getImageUpdateResponse(): MutableLiveData<NetworkingResponse> {
         return imageUploadResponse
     }
 
-    fun getUserData(): MutableLiveData<User> {
-        userReference()?.addValueEventListener(object : ValueEventListener {
+    fun getUserData(): Disposable = RxFirebaseDatabase.observeSingleValueEvent(
+        currUserReference() as Query,
+        User::class.java
+    )
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe({ data ->
+            ChatApplication.setUser(data)
+            val response = NetworkingResponse(status = USER_DATA_SUCCESS)
+            userDataResponse.postValue(response)
+        }, {
+            val response = NetworkingResponse(USER_DATA_FAILED, it.message, "Failed")
+            userDataResponse.postValue(response)
+        })
+
+    fun getFriendData(username: String): MutableLiveData<User> {
+        val ref = userReference()?.orderByChild("username")?.equalTo(username)
+
+        ref?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    val userData = dataSnapshot.getValue(User::class.java)
-                    user.postValue(userData)
+                for (snapshot in dataSnapshot.children) {
+                    val userData = snapshot.getValue(User::class.java)
+                    chatUser.postValue(userData)
                 }
             }
 
@@ -153,15 +190,15 @@ class FirebaseSource {
 
             }
         })
-        return user
+        return chatUser
     }
 
     fun getFriendList(): MutableLiveData<ArrayList<User>> {
         val reference = firebaseDatabase.getReference("Users")
-        val friendList: ArrayList<User> = ArrayList()
 
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val friendList: ArrayList<User> = ArrayList()
                 for (snapshot in dataSnapshot.children) {
                     val userItem = snapshot.getValue(User::class.java)
                     userItem?.let {
@@ -199,6 +236,99 @@ class FirebaseSource {
 
     fun getResetPasswordResponse(): MutableLiveData<NetworkingResponse> {
         return resetPasswordResponse
+    }
+
+    fun sendMessage(sender: String, receiver: String, message: String) {
+        val map: HashMap<String, String> = hashMapOf(
+            "sender" to sender, "receiver" to receiver,
+            "message" to message
+        )
+
+        chatReference()?.push()?.setValue(map)
+    }
+
+    fun readMessage(myUsername: String, friendUsername: String): MutableLiveData<ArrayList<Chat>> {
+
+        chatReference()?.addValueEventListener(object : ValueEventListener {
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val chatList: ArrayList<Chat> = ArrayList()
+                for (snapshot in dataSnapshot.children) {
+                    val chatItem = snapshot.getValue(Chat::class.java)
+                    chatItem?.let {
+                        if ((it.sender == myUsername && it.receiver == friendUsername)
+                            || it.receiver == myUsername && it.sender == friendUsername
+                        ) {
+                            chatList.add(it)
+                        }
+                    }
+                }
+                chats.postValue(chatList)
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+        })
+        return chats
+    }
+
+    fun getChatFriendList(myUsername: String): MutableLiveData<ArrayList<User>> {
+        chatReference()?.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val friendList: ArrayList<String> = ArrayList()
+                for (snapshot in dataSnapshot.children) {
+                    val chat = snapshot.getValue(Chat::class.java)
+
+                    if (chat?.sender.equals(myUsername)) {
+                        chat?.receiver?.let {
+                            if (!friendList.contains(it)) {
+                                friendList.add(it)
+                            }
+                        }
+                    }
+                    if (chat?.receiver.equals(myUsername)) {
+                        chat?.sender?.let {
+                            if (!friendList.contains(it)) {
+                                friendList.add(it)
+                            }
+                        }
+                    }
+                }
+                getChatFriends(friendList)
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+        })
+
+        return chatFriends
+    }
+
+    fun getChatFriends(friendList: ArrayList<String>) {
+        userReference()?.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val friends: ArrayList<User> = ArrayList()
+
+                for (snapshot in dataSnapshot.children) {
+                    val friend = snapshot.getValue(User::class.java)
+
+                    for (username in friendList) {
+                        friend?.let {
+                            if (it.username.equals(username)) {
+                                friends.add(friend)
+                            }
+                        }
+                    }
+                }
+                chatFriends.value = friends
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+        })
     }
 }
 
