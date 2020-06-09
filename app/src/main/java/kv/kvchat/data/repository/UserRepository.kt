@@ -2,6 +2,7 @@ package kv.kvchat.data.repository
 
 import android.net.Uri
 import kv.kvchat.data.firebase.FirebaseSource
+import kv.kvchat.data.firebase.NetworkingResponse
 
 class UserRepository(private val firebase: FirebaseSource) {
 
@@ -22,6 +23,8 @@ class UserRepository(private val firebase: FirebaseSource) {
     fun getImageUpdateResponse() = firebase.getImageUpdateResponse()
 
     fun getUserDataResponse() = firebase.userDataResponse
+
+    fun setUserDataResponse(response: NetworkingResponse) = firebase.setUserDataResponse(response)
 
     fun changeName(name: String) = firebase.changeName(name)
 

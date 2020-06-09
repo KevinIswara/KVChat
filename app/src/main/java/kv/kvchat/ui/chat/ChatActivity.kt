@@ -86,7 +86,7 @@ class ChatActivity : AppCompatActivity(), KodeinAware {
 
     private fun setObserver() {
         // observe friend data to change toolbar (display friend's profile and name)
-        viewModel.getFriends().observe(this, Observer { friendData ->
+        viewModel.getFriendData().observe(this, Observer { friendData ->
             friend = friendData
             setToolbar()
             chatAdapter.updateFriendImageUrl(friendData.imageUrl)

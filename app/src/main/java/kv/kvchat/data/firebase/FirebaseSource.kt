@@ -175,6 +175,10 @@ class FirebaseSource {
             userDataResponse.postValue(response)
         })
 
+    fun setUserDataResponse(response: NetworkingResponse) {
+        userDataResponse.value = response
+    }
+
     fun getFriendData(username: String): MutableLiveData<User> {
         val ref = userReference()?.orderByChild("username")?.equalTo(username)
 

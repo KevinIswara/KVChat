@@ -26,7 +26,7 @@ class ChatViewModel(
         return chats
     }
 
-    fun getFriends(): MutableLiveData<User> {
+    fun getFriendData(): MutableLiveData<User> {
         return friendData
     }
 

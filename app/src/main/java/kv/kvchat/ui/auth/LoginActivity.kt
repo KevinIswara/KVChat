@@ -24,6 +24,8 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
     private lateinit var viewModel: AuthViewModel
     private lateinit var binding: ActivityLoginBinding
 
+    private var loginSuccess = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,10 +36,12 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
         viewModel.authListener = this
 
         viewModel.getUserDataResponse().observe(this, Observer { response ->
-            if (response.status == FirebaseSource.USER_DATA_SUCCESS) {
-                onSuccess(FirebaseSource.USER_DATA_SUCCESS)
-            } else {
-                onFailure(response.message ?: "getUserData Failed")
+            if (loginSuccess) {
+                if (response.status == FirebaseSource.USER_DATA_SUCCESS) {
+                    onSuccess(FirebaseSource.USER_DATA_SUCCESS)
+                } else {
+                    onFailure(response.message ?: "getUserData Failed")
+                }
             }
         })
     }
@@ -48,6 +52,7 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
 
     override fun onSuccess(code: Int) {
         if (code == AuthViewModel.LOGIN_SUCCESS) {
+            loginSuccess = true
             viewModel.getUserData()
         } else if (code == FirebaseSource.USER_DATA_SUCCESS) {
             binding.progressbar.visibility = View.GONE

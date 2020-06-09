@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kv.kvchat.ChatApplication
-import kv.kvchat.databinding.ChatsFragmentBinding
+import kv.kvchat.databinding.FragmentChatsBinding
 
 class ChatsFragment : Fragment() {
 
@@ -31,7 +31,7 @@ class ChatsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = ChatsFragmentBinding.inflate(inflater, container, false)
+        val binding = FragmentChatsBinding.inflate(inflater, container, false)
 
 
         binding.rvChats.apply {

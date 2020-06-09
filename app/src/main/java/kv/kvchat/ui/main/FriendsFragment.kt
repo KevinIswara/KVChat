@@ -10,7 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import kv.kvchat.databinding.FriendsFragmentBinding
+import kv.kvchat.data.model.User
+import kv.kvchat.databinding.FragmentFriendsBinding
 
 class FriendsFragment : Fragment() {
 
@@ -22,6 +23,8 @@ class FriendsFragment : Fragment() {
 
     private lateinit var friendsAdapter: FriendsAdapter
 
+    private lateinit var friends: ArrayList<User>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -32,7 +35,7 @@ class FriendsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = FriendsFragmentBinding.inflate(inflater, container, false)
+        val binding = FragmentFriendsBinding.inflate(inflater, container, false)
 
         binding.rvFriends.apply {
             adapter = friendsAdapter
@@ -41,12 +44,13 @@ class FriendsFragment : Fragment() {
         }
 
         viewModel = ViewModelProviders.of(activity!!).get(MainViewModel::class.java)
-        viewModel.friends.observe(this, Observer { list ->
+        viewModel.getFriends().observe(this, Observer { list ->
+            friends = list
             friendsAdapter.updateData(list, binding.etSearch.text.toString())
         })
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                friendsAdapter.updateData(viewModel.friends.value, s.toString())
+                friendsAdapter.updateData(friends, s.toString())
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {

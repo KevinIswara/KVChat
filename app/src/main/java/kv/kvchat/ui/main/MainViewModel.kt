@@ -13,19 +13,15 @@ class MainViewModel(
     private val chatRepository: ChatRepository
 ) : ViewModel() {
 
-    val friends: MutableLiveData<ArrayList<User>> = userRepository.getFriends()
+    private var friends = userRepository.getFriends()
 
-    private var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
+    private var imageUploadResponse = userRepository.getImageUpdateResponse()
 
     private var chatFriends: MutableLiveData<ArrayList<User>> = MutableLiveData()
 
     var imageUri: Uri? = null
     var name: String? = null
     var username: String? = null
-
-    fun init() {
-        imageUploadResponse = userRepository.getImageUpdateResponse()
-    }
 
     fun logout() {
         userRepository.logout()
@@ -49,11 +45,19 @@ class MainViewModel(
         imageUploadResponse.value?.status = status
     }
 
+    fun getFriends(): MutableLiveData<ArrayList<User>> {
+        return friends
+    }
+
     fun getChatFriendsFromFirebase(username: String) {
         chatFriends = chatRepository.getChatFriends(username)
     }
 
     fun getChatFriends(): MutableLiveData<ArrayList<User>> {
         return chatFriends
+    }
+
+    fun resetUserDataResponse() {
+        userRepository.setUserDataResponse(NetworkingResponse())
     }
 }
