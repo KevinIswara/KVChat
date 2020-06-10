@@ -26,8 +26,7 @@ class FirebaseSource {
 
     var friends: MutableLiveData<ArrayList<User>> = MutableLiveData()
     var chats: MutableLiveData<ArrayList<Chat>> = MutableLiveData()
-
-    var chatFriends: MutableLiveData<ArrayList<User>> = MutableLiveData()
+    var chatFriends: MutableLiveData<HashMap<User, String?>> = MutableLiveData()
 
     var userDataResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
 
@@ -284,7 +283,10 @@ class FirebaseSource {
         return chats
     }
 
-    fun getChatFriendList(myUsername: String): MutableLiveData<ArrayList<User>> {
+    fun getChatFriendList(myUsername: String): MutableLiveData<HashMap<User, String?>> {
+
+        var lastMessage: HashMap<String, String> = HashMap()
+
         chatReference()?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val friendList: ArrayList<String> = ArrayList()
@@ -296,6 +298,7 @@ class FirebaseSource {
                             if (!friendList.contains(it)) {
                                 friendList.add(it)
                             }
+                            lastMessage[chat.receiver] = chat.message
                         }
                     }
                     if (chat?.receiver.equals(myUsername)) {
@@ -303,10 +306,11 @@ class FirebaseSource {
                             if (!friendList.contains(it)) {
                                 friendList.add(it)
                             }
+                            lastMessage[chat.sender] = chat.message
                         }
                     }
                 }
-                getChatFriends(friendList)
+                getChatFriends(friendList, lastMessage)
             }
 
             override fun onCancelled(p0: DatabaseError) {
@@ -317,10 +321,10 @@ class FirebaseSource {
         return chatFriends
     }
 
-    fun getChatFriends(friendList: ArrayList<String>) {
+    fun getChatFriends(friendList: ArrayList<String>, lastMessage: HashMap<String, String>) {
         userReference()?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val friends: ArrayList<User> = ArrayList()
+                val chatFriendsHashMap: HashMap<User, String?> = HashMap()
 
                 for (snapshot in dataSnapshot.children) {
                     val friend = snapshot.getValue(User::class.java)
@@ -328,12 +332,12 @@ class FirebaseSource {
                     for (username in friendList) {
                         friend?.let {
                             if (it.username.equals(username)) {
-                                friends.add(friend)
+                                chatFriendsHashMap[friend] = lastMessage[username]
                             }
                         }
                     }
                 }
-                chatFriends.value = friends
+                chatFriends.value = chatFriendsHashMap
             }
 
             override fun onCancelled(p0: DatabaseError) {

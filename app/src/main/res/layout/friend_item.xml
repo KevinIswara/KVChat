@@ -61,8 +61,21 @@
                 android:layout_marginLeft="10dp"
                 android:layout_toEndOf="@id/iv_friend"
                 android:layout_toRightOf="@id/iv_friend"
-                android:text="username"
-                android:textSize="18sp" />
+                android:paddingBottom="10dp"
+                android:textSize="18sp"
+                tools:text="username" />
+
+            <TextView
+                android:id="@+id/tv_last_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/iv_friend"
+                android:layout_marginStart="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_toEndOf="@id/iv_friend"
+                android:layout_toRightOf="@id/iv_friend"
+                android:textSize="14sp"
+                tools:text="Last message this chat have" />
 
             <ImageView
                 android:id="@+id/iv_status"

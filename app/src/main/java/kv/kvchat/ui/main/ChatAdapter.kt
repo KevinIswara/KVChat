@@ -1,5 +1,6 @@
 package kv.kvchat.ui.main
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
@@ -14,21 +15,17 @@ import kv.kvchat.data.model.User
 import kv.kvchat.databinding.FriendItemBinding
 import kv.kvchat.ui.chat.ChatActivity
 
-class FriendsAdapter(val context: Context) :
-    RecyclerView.Adapter<FriendsAdapter.FriendsViewHolder>() {
+class ChatAdapter(val context: Context) : RecyclerView.Adapter<ChatAdapter.FriendsViewHolder>() {
     private var items: MutableList<User?> = mutableListOf()
-    private var filter: String = ""
+    var lastMessage: HashMap<User, String?> = HashMap()
 
-    fun updateData(items: List<User>?, filter: String) {
-        this.filter = filter
+    fun updateData(items: HashMap<User, String?>) {
         this.items.clear()
-        items?.also {
-            for (item in items) {
-                item.name?.let {
-                    if (it.toLowerCase().contains(filter.toLowerCase())) {
-                        this.items.add(item)
-                    }
-                }
+        this.lastMessage = items
+        val friendList = ArrayList(items.keys)
+        friendList.also {
+            for (item in friendList) {
+                this.items.add(item)
             }
         }
         if (this.items.size == 0) {
@@ -61,6 +58,7 @@ class FriendsAdapter(val context: Context) :
 
     inner class FriendsViewHolder(val itemBinding: FriendItemBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
+        @SuppressLint("SetTextI18n")
         fun bindView(item: User?) = with(itemView) {
             if (item != null) {
                 itemBinding.clError.visibility = View.GONE
@@ -77,7 +75,19 @@ class FriendsAdapter(val context: Context) :
                     .into(itemBinding.ivFriend)
 
                 itemBinding.tvFriendName.text = item.name
-                itemBinding.ivStatus.visibility = View.GONE
+                lastMessage[item]?.let {
+                    itemBinding.tvLastMessage.visibility = View.VISIBLE
+                    if (it.length >= 40) {
+                        itemBinding.tvLastMessage.text = "${it.subSequence(0, 39)} ..."
+                    } else itemBinding.tvLastMessage.text = it
+                }
+
+                if (item.status == "online") {
+                    itemBinding.ivStatus.setImageResource(R.drawable.ic_online)
+                } else {
+                    itemBinding.ivStatus.setImageResource(R.drawable.ic_offline)
+                }
+
             } else {
                 itemBinding.clError.visibility = View.VISIBLE
                 itemBinding.rlItem.visibility = View.GONE

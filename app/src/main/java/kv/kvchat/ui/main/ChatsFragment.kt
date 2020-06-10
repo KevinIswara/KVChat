@@ -19,12 +19,12 @@ class ChatsFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
 
-    private lateinit var friendsAdapter: FriendsAdapter
+    private lateinit var chatAdapter: ChatAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        friendsAdapter = FriendsAdapter(context!!, true)
+        chatAdapter = ChatAdapter(context!!)
     }
 
     override fun onCreateView(
@@ -35,7 +35,7 @@ class ChatsFragment : Fragment() {
 
 
         binding.rvChats.apply {
-            adapter = friendsAdapter
+            adapter = chatAdapter
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
         }
@@ -45,7 +45,7 @@ class ChatsFragment : Fragment() {
         viewModel.getChatFriendsFromFirebase(ChatApplication.getUser().username ?: "")
 
         viewModel.getChatFriends().observe(this, Observer { list ->
-            friendsAdapter.updateData(list, "")
+            chatAdapter.updateData(list)
         })
 
         return binding.root
