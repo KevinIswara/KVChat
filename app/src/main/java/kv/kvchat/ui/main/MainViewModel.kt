@@ -17,7 +17,7 @@ class MainViewModel(
 
     private var imageUploadResponse = userRepository.getImageUpdateResponse()
 
-    private var chatFriends: MutableLiveData<ArrayList<User>> = MutableLiveData()
+    private var chatFriends: MutableLiveData<HashMap<User, String?>> = MutableLiveData()
 
     var imageUri: Uri? = null
     var name: String? = null
@@ -53,7 +53,7 @@ class MainViewModel(
         chatFriends = chatRepository.getChatFriends(username)
     }
 
-    fun getChatFriends(): MutableLiveData<ArrayList<User>> {
+    fun getChatFriends(): MutableLiveData<HashMap<User, String?>> {
         return chatFriends
     }
 
