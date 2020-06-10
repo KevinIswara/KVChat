@@ -324,7 +324,6 @@ class FirebaseSource {
     fun getChatFriends(friendList: ArrayList<String>, lastMessage: HashMap<String, String>) {
         userReference()?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val friends: ArrayList<User> = ArrayList()
                 val chatFriendsHashMap: HashMap<User, String?> = HashMap()
 
                 for (snapshot in dataSnapshot.children) {
@@ -333,7 +332,6 @@ class FirebaseSource {
                     for (username in friendList) {
                         friend?.let {
                             if (it.username.equals(username)) {
-                                friends.add(friend)
                                 chatFriendsHashMap[friend] = lastMessage[username]
                             }
                         }
