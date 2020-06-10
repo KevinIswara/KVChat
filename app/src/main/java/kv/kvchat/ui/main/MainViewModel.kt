@@ -60,4 +60,8 @@ class MainViewModel(
     fun resetUserDataResponse() {
         userRepository.setUserDataResponse(NetworkingResponse())
     }
+
+    fun setUserStatus(status: String) {
+        userRepository.setUserStatus(status)
+    }
 }

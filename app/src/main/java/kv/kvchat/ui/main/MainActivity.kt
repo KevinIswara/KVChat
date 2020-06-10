@@ -40,6 +40,16 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         setToolbar()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.setUserStatus("online")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.setUserStatus("offline")
+    }
+
     private fun setToolbar() {
         binding.toolbar.tvTitle.text = ChatApplication.getUser().name
 

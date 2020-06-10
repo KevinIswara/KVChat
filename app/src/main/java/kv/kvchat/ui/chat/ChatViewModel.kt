@@ -49,4 +49,8 @@ class ChatViewModel(
         }
         msgText.value = ""
     }
+
+    fun setUserStatus(status: String) {
+        userRepository.setUserStatus(status)
+    }
 }

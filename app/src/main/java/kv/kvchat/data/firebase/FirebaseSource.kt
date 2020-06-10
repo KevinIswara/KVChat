@@ -75,7 +75,8 @@ class FirebaseSource {
                         val map: HashMap<String, String> = hashMapOf(
                             "username" to username,
                             "name" to name,
-                            "imageUrl" to "default"
+                            "imageUrl" to "default",
+                            "status" to "offline"
                         )
                         currUserReference()?.setValue(map)?.addOnCompleteListener { task ->
                             if (task.isSuccessful) {
@@ -98,6 +99,12 @@ class FirebaseSource {
             return firebaseDatabase.getReference("Users").child(it)
         }
         return null
+    }
+
+    fun setUserStatus(status: String) {
+        val map: HashMap<String, String> = hashMapOf("status" to status)
+
+        currUserReference()?.updateChildren(map as Map<String, Any>)
     }
 
     private fun userReference(): DatabaseReference? = firebaseDatabase.getReference("Users")

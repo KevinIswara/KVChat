@@ -35,4 +35,6 @@ class UserRepository(private val firebase: FirebaseSource) {
     fun getPasswordResetResponse() = firebase.getResetPasswordResponse()
 
     fun getFriendData(username: String) = firebase.getFriendData(username)
+
+    fun setUserStatus(status: String) = firebase.setUserStatus(status)
 }
