@@ -1,6 +1,8 @@
 package kv.kvchat
 
 import android.app.Application
+import android.content.Context
+import androidx.multidex.MultiDex
 import kv.kvchat.data.repository.UserRepository
 import kv.kvchat.data.firebase.FirebaseSource
 import kv.kvchat.data.model.User
@@ -41,5 +43,10 @@ class ChatApplication : Application(), KodeinAware {
         bind() from provider { ResetPasswordViewModelFactory(instance()) }
         bind() from provider { MainViewModelFactory(instance(), instance()) }
         bind() from provider { ChatViewModelFactory(instance(), instance()) }
+    }
+
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        MultiDex.install(this)
     }
 }

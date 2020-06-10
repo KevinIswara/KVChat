@@ -1,5 +1,6 @@
 package kv.kvchat.ui.chat
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
@@ -12,6 +13,7 @@ import kv.kvchat.ChatApplication
 import kv.kvchat.R
 import kv.kvchat.data.model.User
 import kv.kvchat.databinding.ActivityChatBinding
+import kv.kvchat.ui.main.MainActivity
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
@@ -41,7 +43,14 @@ class ChatActivity : AppCompatActivity(), KodeinAware {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.toolbar.toolbar.contentInsetStartWithNavigation = 0
-        binding.toolbar.toolbar.setNavigationOnClickListener { finish() }
+        binding.toolbar.toolbar.setNavigationOnClickListener {
+            startActivity(
+                Intent(
+                    this,
+                    MainActivity::class.java
+                ).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            )
+        }
 
         setAdapter()
         getChatList()
@@ -101,5 +110,15 @@ class ChatActivity : AppCompatActivity(), KodeinAware {
                 }
             }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.setUserStatus("online")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.setUserStatus("offline")
     }
 }

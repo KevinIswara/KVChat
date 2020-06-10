@@ -39,9 +39,10 @@ class LoginActivity : AppCompatActivity(), AuthListener, KodeinAware {
             if (loginSuccess) {
                 if (response.status == FirebaseSource.USER_DATA_SUCCESS) {
                     onSuccess(FirebaseSource.USER_DATA_SUCCESS)
-                } else {
+                } else if (response.status == FirebaseSource.USER_DATA_FAILED) {
                     onFailure(response.message ?: "getUserData Failed")
                 }
+                viewModel.setStatus(0)
             }
         })
     }

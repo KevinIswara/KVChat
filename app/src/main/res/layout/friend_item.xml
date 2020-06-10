@@ -76,6 +76,17 @@
                 android:layout_toRightOf="@id/iv_friend"
                 android:textSize="14sp"
                 tools:text="Last message this chat have" />
+
+            <ImageView
+                android:id="@+id/iv_status"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_below="@id/tv_friend_name"
+                android:layout_marginLeft="-15dp"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@id/iv_friend"
+                android:layout_toRightOf="@id/iv_friend"
+                android:src="@drawable/ic_offline" />
         </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

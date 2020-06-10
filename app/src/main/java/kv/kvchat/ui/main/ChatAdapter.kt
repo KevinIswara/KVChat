@@ -81,6 +81,13 @@ class ChatAdapter(val context: Context) : RecyclerView.Adapter<ChatAdapter.Frien
                         itemBinding.tvLastMessage.text = "${it.subSequence(0, 39)} ..."
                     } else itemBinding.tvLastMessage.text = it
                 }
+
+                if (item.status == "online") {
+                    itemBinding.ivStatus.setImageResource(R.drawable.ic_online)
+                } else {
+                    itemBinding.ivStatus.setImageResource(R.drawable.ic_offline)
+                }
+
             } else {
                 itemBinding.clError.visibility = View.VISIBLE
                 itemBinding.rlItem.visibility = View.GONE

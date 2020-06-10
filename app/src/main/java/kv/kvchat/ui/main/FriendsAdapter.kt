@@ -14,7 +14,8 @@ import kv.kvchat.data.model.User
 import kv.kvchat.databinding.FriendItemBinding
 import kv.kvchat.ui.chat.ChatActivity
 
-class FriendsAdapter(val context: Context): RecyclerView.Adapter<FriendsAdapter.FriendsViewHolder>() {
+class FriendsAdapter(val context: Context) :
+    RecyclerView.Adapter<FriendsAdapter.FriendsViewHolder>() {
     private var items: MutableList<User?> = mutableListOf()
     private var filter: String = ""
 
@@ -76,6 +77,7 @@ class FriendsAdapter(val context: Context): RecyclerView.Adapter<FriendsAdapter.
                     .into(itemBinding.ivFriend)
 
                 itemBinding.tvFriendName.text = item.name
+                itemBinding.ivStatus.visibility = View.GONE
             } else {
                 itemBinding.clError.visibility = View.VISIBLE
                 itemBinding.rlItem.visibility = View.GONE
