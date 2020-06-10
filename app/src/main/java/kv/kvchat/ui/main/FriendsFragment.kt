@@ -28,7 +28,7 @@ class FriendsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        friendsAdapter = FriendsAdapter(context!!)
+        friendsAdapter = FriendsAdapter(context!!, false)
     }
 
     override fun onCreateView(
