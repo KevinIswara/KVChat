@@ -10,5 +10,10 @@ class ChatRepository(private val firebase: FirebaseSource) {
     fun readMessage(myUsername: String, friendUsername: String) =
         firebase.readMessage(myUsername, friendUsername)
 
+    fun seenMessage(myUsername: String, friendUsername: String) =
+        firebase.seenMessage(myUsername, friendUsername)
+
+    fun deleteSeenMessage() = firebase.deleteSeenMessage()
+
     fun getChatFriends(myUsername: String) = firebase.getChatFriendList(myUsername)
 }

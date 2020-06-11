@@ -2,6 +2,7 @@ package kv.kvchat.ui.chat
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
@@ -69,17 +70,17 @@ class ChatAdapter(val context: Context) : RecyclerView.Adapter<ChatAdapter.ChatV
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) = with(holder) {
-        bindView(items[position])
+        bindView(items[position], position)
     }
 
     abstract inner class ChatViewHolder(itemView: ViewDataBinding) :
         RecyclerView.ViewHolder(itemView.root) {
-        abstract fun bindView(item: Chat)
+        abstract fun bindView(item: Chat, position: Int)
     }
 
     inner class ChatLeftViewHolder(private val itemBinding: ChatItemLeftBinding) :
         ChatViewHolder(itemBinding) {
-        override fun bindView(item: Chat) {
+        override fun bindView(item: Chat, position: Int) {
             itemBinding.tvMessage.text = item.message
 
             val options = RequestOptions()
@@ -96,8 +97,16 @@ class ChatAdapter(val context: Context) : RecyclerView.Adapter<ChatAdapter.ChatV
 
     inner class ChatRightViewHolder(private val itemBinding: ChatItemRightBinding) :
         ChatViewHolder(itemBinding) {
-        override fun bindView(item: Chat) {
+        override fun bindView(item: Chat, position: Int) {
             itemBinding.tvMessage.text = item.message
+            if (position == (items.size - 1)) {
+                itemBinding.tvSeen.visibility = View.VISIBLE
+                if (item.isseen) {
+                    itemBinding.tvSeen.text = "Seen"
+                } else {
+                    itemBinding.tvSeen.text = "Delivered"
+                }
+            } else itemBinding.tvSeen.visibility = View.GONE
         }
     }
 }

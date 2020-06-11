@@ -28,6 +28,8 @@ class FirebaseSource {
     var chats: MutableLiveData<ArrayList<Chat>> = MutableLiveData()
     var chatFriends: MutableLiveData<HashMap<User, String?>> = MutableLiveData()
 
+    var seenListener: ValueEventListener? = null
+
     var userDataResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
 
     private var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
@@ -249,9 +251,9 @@ class FirebaseSource {
     }
 
     fun sendMessage(sender: String, receiver: String, message: String) {
-        val map: HashMap<String, String> = hashMapOf(
+        val map: HashMap<String, Any> = hashMapOf(
             "sender" to sender, "receiver" to receiver,
-            "message" to message
+            "message" to message, "isseen" to false
         )
 
         chatReference()?.push()?.setValue(map)
@@ -281,6 +283,31 @@ class FirebaseSource {
             }
         })
         return chats
+    }
+
+    fun seenMessage(myUsername: String, friendUsername: String) {
+        seenListener = chatReference()?.addValueEventListener(object: ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                for (dataSnapshot in p0.children) {
+                    val chatItem = dataSnapshot.getValue(Chat::class.java)
+                    if (chatItem?.receiver.equals(myUsername) && chatItem?.sender.equals(friendUsername)) {
+                        val map : HashMap<String, Any> = hashMapOf("isseen" to true)
+                        dataSnapshot.ref.updateChildren(map)
+                    }
+                }
+            }
+
+        })
+    }
+
+    fun deleteSeenMessage() {
+        seenListener?.let {
+            chatReference()?.removeEventListener(it)
+        }
     }
 
     fun getChatFriendList(myUsername: String): MutableLiveData<HashMap<User, String?>> {
