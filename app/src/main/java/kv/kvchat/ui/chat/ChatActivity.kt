@@ -120,5 +120,6 @@ class ChatActivity : AppCompatActivity(), KodeinAware {
     override fun onPause() {
         super.onPause()
         viewModel.setUserStatus("offline")
+        viewModel.deleteSeenMessageListener()
     }
 }
