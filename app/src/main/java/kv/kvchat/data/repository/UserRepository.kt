@@ -15,6 +15,8 @@ class UserRepository(private val firebase: FirebaseSource) {
 
     fun getUserData() = firebase.getUserData()
 
+    fun getUserDataAsync() = firebase.getUserDataAsync()
+
     fun logout() = firebase.logout()
 
     fun uploadImage(imageUri: Uri, fileExtension: String) =

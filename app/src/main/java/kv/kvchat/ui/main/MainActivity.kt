@@ -4,13 +4,14 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.tabs.TabLayout
-import kv.kvchat.ChatApplication
 import kv.kvchat.R
+import kv.kvchat.data.model.User
 import kv.kvchat.databinding.ActivityMainBinding
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -37,7 +38,11 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         binding.lifecycleOwner = this
-        setToolbar()
+
+        viewModel.getUserData()
+        viewModel.getUser().observe(this, Observer { userData ->
+            setToolbar(userData)
+        })
     }
 
     override fun onResume() {
@@ -50,8 +55,8 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         viewModel.setUserStatus("offline")
     }
 
-    private fun setToolbar() {
-        binding.toolbar.tvTitle.text = ChatApplication.getUser().name
+    private fun setToolbar(userData: User) {
+        binding.toolbar.tvTitle.text = userData.name
 
         val options = RequestOptions()
             .circleCrop()
@@ -59,7 +64,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             .error(R.drawable.ic_account_circle_white_30dp)
             .fallback(R.drawable.ic_account_circle_white_30dp)
 
-        Glide.with(this).load(ChatApplication.getUser().imageUrl)
+        Glide.with(this).load(userData.imageUrl)
             .apply(options)
             .into(binding.toolbar.ivToolbar)
     }

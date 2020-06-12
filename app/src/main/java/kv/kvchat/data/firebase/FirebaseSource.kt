@@ -183,6 +183,21 @@ class FirebaseSource {
             userDataResponse.postValue(response)
         })
 
+    fun getUserDataAsync(): MutableLiveData<User> {
+        currUserReference()?.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    val userData = dataSnapshot.getValue(User::class.java)
+                    user.postValue(userData)
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+            }
+        })
+        return user
+    }
+
     fun setUserDataResponse(response: NetworkingResponse) {
         userDataResponse.value = response
     }
@@ -286,7 +301,7 @@ class FirebaseSource {
     }
 
     fun seenMessage(myUsername: String, friendUsername: String) {
-        seenListener = chatReference()?.addValueEventListener(object: ValueEventListener {
+        seenListener = chatReference()?.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
 
             }
@@ -294,8 +309,11 @@ class FirebaseSource {
             override fun onDataChange(p0: DataSnapshot) {
                 for (dataSnapshot in p0.children) {
                     val chatItem = dataSnapshot.getValue(Chat::class.java)
-                    if (chatItem?.receiver.equals(myUsername) && chatItem?.sender.equals(friendUsername)) {
-                        val map : HashMap<String, Any> = hashMapOf("isseen" to true)
+                    if (chatItem?.receiver.equals(myUsername) && chatItem?.sender.equals(
+                            friendUsername
+                        )
+                    ) {
+                        val map: HashMap<String, Any> = hashMapOf("isseen" to true)
                         dataSnapshot.ref.updateChildren(map)
                     }
                 }

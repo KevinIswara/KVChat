@@ -19,12 +19,22 @@ class MainViewModel(
 
     private var chatFriends: MutableLiveData<HashMap<User, String?>> = MutableLiveData()
 
+    private var user: MutableLiveData<User> = MutableLiveData()
+
     var imageUri: Uri? = null
     var name: String? = null
     var username: String? = null
 
     fun logout() {
         userRepository.logout()
+    }
+
+    fun getUserData() {
+        user = userRepository.getUserDataAsync()
+    }
+
+    fun getUser(): MutableLiveData<User> {
+        return user
     }
 
     fun uploadProfilePicture(fileExtension: String) {

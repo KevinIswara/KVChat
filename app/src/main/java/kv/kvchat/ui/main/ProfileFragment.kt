@@ -10,6 +10,7 @@ import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +28,7 @@ import com.bumptech.glide.request.RequestOptions
 import kv.kvchat.ChatApplication
 import kv.kvchat.R
 import kv.kvchat.data.firebase.FirebaseSource
+import kv.kvchat.data.model.User
 import kv.kvchat.databinding.FragmentProfileBinding
 import kv.kvchat.ui.auth.LoginActivity
 
@@ -53,7 +55,11 @@ class ProfileFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(activity!!).get(MainViewModel::class.java)
-        setProfile()
+
+        viewModel.getUserData()
+        viewModel.getUser().observe(this, Observer { user ->
+            setProfile(user)
+        })
         setLogout()
         pd = ProgressDialog(context)
         context?.let {
@@ -63,8 +69,7 @@ class ProfileFragment : Fragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    fun setProfile() {
-        val userData = ChatApplication.getUser()
+    fun setProfile(userData: User) {
 
         val options = RequestOptions()
             .circleCrop()
