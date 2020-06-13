@@ -1,6 +1,7 @@
 package kv.kvchat.data.firebase
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCompleteListener
@@ -45,6 +46,8 @@ class FirebaseSource {
     private var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
 
     private var resetPasswordResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
+
+    private var notify: Boolean = false
 
     companion object {
         const val IMAGE_UPLOAD_SUCCESS = 11
@@ -285,7 +288,10 @@ class FirebaseSource {
 
         chatReference()?.push()?.setValue(map)
 
-
+        if (notify) {
+            sendNotification(receiver, sender, message)
+        }
+        setNotify(false)
     }
 
     fun readMessage(myUsername: String, friendUsername: String): MutableLiveData<ArrayList<Chat>> {
@@ -406,7 +412,7 @@ class FirebaseSource {
     }
 
     fun updateToken(token: String) {
-        tokenReference()?.child(ChatApplication.getUser().username?: "")?.setValue(token)
+        tokenReference()?.child(ChatApplication.getUser().username ?: "")?.setValue(token)
     }
 
     fun getCurrentToken(): String? {
@@ -425,28 +431,29 @@ class FirebaseSource {
     }
 
     fun sendNotification(receiver: String, username: String, message: String) {
-        val query = tokenReference()?.orderByKey().equalTo(receiver)
-        query.addValueEventListener(object : ValueEventListener {
+        val query = tokenReference()?.orderByKey()?.equalTo(receiver)
+        query?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (snapshot in dataSnapshot.children) {
                     val token = snapshot.child("token").value as String
 
-                    val data = Data(username, R.mipmap.ic_launcher,message, "", receiver)
+                    val data = Data(username, R.mipmap.ic_launcher, message, "", receiver)
                     val sender = Sender(data, token)
 
                     ApiClient.getService().sendNotification(sender)
-                        .enqueue(object: Callback<JSONObject>() {
-                            override fun onFailure(call: Call<JSONObject>, t: Throwable) {
-                                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                            }
-
+                        .enqueue(object : Callback<JSONObject> {
                             override fun onResponse(
                                 call: Call<JSONObject>,
                                 response: Response<JSONObject>
                             ) {
-                                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                                if (response.isSuccessful) {
+                                    Log.d("notif", "success")
+                                }
                             }
 
+                            override fun onFailure(call: Call<JSONObject>, t: Throwable) {
+                                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                            }
                         })
                 }
             }
@@ -454,6 +461,10 @@ class FirebaseSource {
             override fun onCancelled(p0: DatabaseError) {
             }
         })
+    }
+
+    fun setNotify(value: Boolean) {
+        notify = value
     }
 }
 

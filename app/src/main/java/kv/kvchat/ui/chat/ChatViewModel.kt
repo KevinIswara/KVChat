@@ -43,6 +43,7 @@ class ChatViewModel(
     }
 
     fun sendMessage() {
+        setNotify(true)
         if (msgText.value != "" && friendData.value != null) {
             chatRepository.sendMessage(
                 ChatApplication.getUser().username.toString(),
@@ -58,5 +59,9 @@ class ChatViewModel(
 
     fun setUserStatus(status: String) {
         userRepository.setUserStatus(status)
+    }
+
+    fun setNotify(value: Boolean) {
+        chatRepository.setNotify(value)
     }
 }

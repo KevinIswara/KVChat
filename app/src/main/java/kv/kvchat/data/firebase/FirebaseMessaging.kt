@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kv.kvchat.ChatApplication
+import kv.kvchat.data.notification.OreoAboveNotification
 import kv.kvchat.ui.chat.ChatActivity
 
 class FirebaseMessaging(val firebaseSource: FirebaseSource) : FirebaseMessagingService() {
@@ -25,7 +26,7 @@ class FirebaseMessaging(val firebaseSource: FirebaseSource) : FirebaseMessagingS
 
         if (sent.equals(currUser)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                sendOAndAboveNotification(p0)
+                sendOreoAboveNotification(p0)
             } else {
                 sendNormalNotification(p0)
             }
@@ -34,7 +35,7 @@ class FirebaseMessaging(val firebaseSource: FirebaseSource) : FirebaseMessagingS
 
     private fun sendNormalNotification(remoteMessage: RemoteMessage) {
         val user = remoteMessage.data["user"]
-        val icon = remoteMessage.data["icon"]?: ""
+        val icon = remoteMessage.data["icon"] ?: ""
         val body = remoteMessage.data["body"]
         val title = remoteMessage.data["title"]
 
@@ -63,7 +64,8 @@ class FirebaseMessaging(val firebaseSource: FirebaseSource) : FirebaseMessagingS
             .setSound(defaultSound)
             .setContentIntent(pendingIntent)
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         var i = 0
         if (j > 0) {
@@ -71,6 +73,41 @@ class FirebaseMessaging(val firebaseSource: FirebaseSource) : FirebaseMessagingS
         }
 
         notificationManager.notify(i, builder.build())
+    }
+
+    fun sendOreoAboveNotification(remoteMessage: RemoteMessage) {
+        val user = remoteMessage.data["user"]
+        val icon = remoteMessage.data["icon"] ?: ""
+        val body = remoteMessage.data["body"] ?: ""
+        val title = remoteMessage.data["title"] ?: ""
+
+        val notification = remoteMessage.notification
+
+        var j = 0
+        user?.let {
+            j = Integer.parseInt(user.replace("[\\D]", ""))
+        }
+
+        val intent = Intent(this, ChatActivity::class.java)
+
+        val bundle = Bundle()
+        bundle.putString("username", user)
+        intent.putExtras(bundle)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
+        val pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT)
+
+        val defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+
+        val notif = OreoAboveNotification(this)
+        val builder = notif.getONotifications(title, body, pendingIntent, defaultSound, icon)
+
+        var i = 0
+        if (j > 0) {
+            i = j
+        }
+
+        notif.getManager()?.notify(i, builder.build())
     }
 
     override fun onNewToken(p0: String) {

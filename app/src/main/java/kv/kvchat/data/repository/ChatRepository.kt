@@ -16,4 +16,6 @@ class ChatRepository(private val firebase: FirebaseSource) {
     fun deleteSeenMessage() = firebase.deleteSeenMessage()
 
     fun getChatFriends(myUsername: String) = firebase.getChatFriendList(myUsername)
+
+    fun setNotify(value: Boolean) = firebase.setNotify(value)
 }
