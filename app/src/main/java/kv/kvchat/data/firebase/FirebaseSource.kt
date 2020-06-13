@@ -3,9 +3,11 @@ package kv.kvchat.data.firebase
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.Continuation
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
@@ -16,7 +18,15 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kv.kvchat.ChatApplication
 import kv.kvchat.data.model.Chat
+import kv.kvchat.data.model.Data
 import kv.kvchat.data.model.User
+import kv.kvchat.R
+import kv.kvchat.data.model.Sender
+import kv.kvchat.data.network.ApiClient
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class FirebaseSource {
 
@@ -111,6 +121,8 @@ class FirebaseSource {
     private fun userReference(): DatabaseReference? = firebaseDatabase.getReference("Users")
 
     private fun chatReference(): DatabaseReference? = firebaseDatabase.getReference("Chats")
+
+    private fun tokenReference(): DatabaseReference? = firebaseDatabase.getReference("Tokens")
 
     private fun storageReference(): StorageReference? {
         return firebaseStorage.getReference("uploads")
@@ -272,6 +284,8 @@ class FirebaseSource {
         )
 
         chatReference()?.push()?.setValue(map)
+
+
     }
 
     fun readMessage(myUsername: String, friendUsername: String): MutableLiveData<ArrayList<Chat>> {
@@ -387,6 +401,57 @@ class FirebaseSource {
 
             override fun onCancelled(p0: DatabaseError) {
 
+            }
+        })
+    }
+
+    fun updateToken(token: String) {
+        tokenReference()?.child(ChatApplication.getUser().username?: "")?.setValue(token)
+    }
+
+    fun getCurrentToken(): String? {
+        var newToken: String? = null
+        FirebaseInstanceId.getInstance().instanceId
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+//                    Log.w(TAG, "getInstanceId failed", task.exception)
+                    return@OnCompleteListener
+                }
+
+                // Get new Instance ID token
+                newToken = task.result?.token
+            })
+        return newToken
+    }
+
+    fun sendNotification(receiver: String, username: String, message: String) {
+        val query = tokenReference()?.orderByKey().equalTo(receiver)
+        query.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (snapshot in dataSnapshot.children) {
+                    val token = snapshot.child("token").value as String
+
+                    val data = Data(username, R.mipmap.ic_launcher,message, "", receiver)
+                    val sender = Sender(data, token)
+
+                    ApiClient.getService().sendNotification(sender)
+                        .enqueue(object: Callback<JSONObject>() {
+                            override fun onFailure(call: Call<JSONObject>, t: Throwable) {
+                                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                            }
+
+                            override fun onResponse(
+                                call: Call<JSONObject>,
+                                response: Response<JSONObject>
+                            ) {
+                                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                            }
+
+                        })
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
             }
         })
     }

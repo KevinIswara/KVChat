@@ -74,4 +74,12 @@ class MainViewModel(
     fun setUserStatus(status: String) {
         userRepository.setUserStatus(status)
     }
+
+    fun updateToken(token: String) {
+        userRepository.updateToken(token)
+    }
+
+    fun getCurrentToken(): String? {
+        return userRepository.getCurrentToken()
+    }
 }

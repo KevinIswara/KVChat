@@ -16,7 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".ui.chat.ChatActivity"></activity>
+        <service
+            android:name=".data.firebase.FirebaseMessaging"
+            android:enabled="true"
+            android:exported="true"></service>
+
+        <activity android:name=".ui.chat.ChatActivity" />
         <activity android:name=".ui.auth.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

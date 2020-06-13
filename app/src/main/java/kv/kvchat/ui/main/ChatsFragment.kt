@@ -48,6 +48,10 @@ class ChatsFragment : Fragment() {
             chatAdapter.updateData(list)
         })
 
+        viewModel.getCurrentToken()?.let {
+            viewModel.updateToken(it)
+        }
+
         return binding.root
     }
 }

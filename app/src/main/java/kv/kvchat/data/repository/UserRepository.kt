@@ -39,4 +39,8 @@ class UserRepository(private val firebase: FirebaseSource) {
     fun getFriendData(username: String) = firebase.getFriendData(username)
 
     fun setUserStatus(status: String) = firebase.setUserStatus(status)
+
+    fun updateToken(token: String) = firebase.updateToken(token)
+
+    fun getCurrentToken(): String? = firebase.getCurrentToken()
 }
