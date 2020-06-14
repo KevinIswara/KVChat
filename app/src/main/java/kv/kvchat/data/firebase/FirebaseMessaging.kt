@@ -2,13 +2,11 @@ package kv.kvchat.data.firebase
 
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -16,7 +14,9 @@ import kv.kvchat.ChatApplication
 import kv.kvchat.data.notification.OreoAboveNotification
 import kv.kvchat.ui.chat.ChatActivity
 
-class FirebaseMessaging(val firebaseSource: FirebaseSource) : FirebaseMessagingService() {
+class FirebaseMessaging() : FirebaseMessagingService() {
+
+    private val firebaseSource = FirebaseSource()
 
     override fun onMessageReceived(p0: RemoteMessage) {
         super.onMessageReceived(p0)
@@ -41,10 +41,7 @@ class FirebaseMessaging(val firebaseSource: FirebaseSource) : FirebaseMessagingS
 
         val notification = remoteMessage.notification
 
-        var j = 0
-        user?.let {
-            j = Integer.parseInt(user.replace("[\\D]", ""))
-        }
+        val j = 1
 
         val intent = Intent(this, ChatActivity::class.java)
 
@@ -67,15 +64,10 @@ class FirebaseMessaging(val firebaseSource: FirebaseSource) : FirebaseMessagingS
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        var i = 0
-        if (j > 0) {
-            i = j
-        }
-
-        notificationManager.notify(i, builder.build())
+        notificationManager.notify(j, builder.build())
     }
 
-    fun sendOreoAboveNotification(remoteMessage: RemoteMessage) {
+    private fun sendOreoAboveNotification(remoteMessage: RemoteMessage) {
         val user = remoteMessage.data["user"]
         val icon = remoteMessage.data["icon"] ?: ""
         val body = remoteMessage.data["body"] ?: ""
@@ -83,10 +75,7 @@ class FirebaseMessaging(val firebaseSource: FirebaseSource) : FirebaseMessagingS
 
         val notification = remoteMessage.notification
 
-        var j = 0
-        user?.let {
-            j = Integer.parseInt(user.replace("[\\D]", ""))
-        }
+        val j = 1
 
         val intent = Intent(this, ChatActivity::class.java)
 
@@ -102,12 +91,7 @@ class FirebaseMessaging(val firebaseSource: FirebaseSource) : FirebaseMessagingS
         val notif = OreoAboveNotification(this)
         val builder = notif.getONotifications(title, body, pendingIntent, defaultSound, icon)
 
-        var i = 0
-        if (j > 0) {
-            i = j
-        }
-
-        notif.getManager()?.notify(i, builder.build())
+        notif.getManager()?.notify(j, builder.build())
     }
 
     override fun onNewToken(p0: String) {

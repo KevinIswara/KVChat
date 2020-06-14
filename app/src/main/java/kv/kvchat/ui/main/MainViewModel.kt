@@ -79,7 +79,7 @@ class MainViewModel(
         userRepository.updateToken(token)
     }
 
-    fun getCurrentToken(): String? {
+    fun getCurrentToken(): MutableLiveData<String> {
         return userRepository.getCurrentToken()
     }
 }

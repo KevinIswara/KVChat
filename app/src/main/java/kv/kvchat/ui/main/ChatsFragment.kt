@@ -21,6 +21,8 @@ class ChatsFragment : Fragment() {
 
     private lateinit var chatAdapter: ChatAdapter
 
+    private lateinit var observer: Observer<String>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,10 +50,15 @@ class ChatsFragment : Fragment() {
             chatAdapter.updateData(list)
         })
 
-        viewModel.getCurrentToken()?.let {
-            viewModel.updateToken(it)
-        }
+        observer = Observer { onTokenChanged(it) }
+
+        viewModel.getCurrentToken().observe(this, observer)
 
         return binding.root
+    }
+
+    private fun onTokenChanged(token: String) {
+        viewModel.updateToken(token)
+        viewModel.getCurrentToken().removeObserver(observer)
     }
 }

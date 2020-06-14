@@ -1,6 +1,7 @@
 package kv.kvchat.data.repository
 
 import android.net.Uri
+import androidx.lifecycle.MutableLiveData
 import kv.kvchat.data.firebase.FirebaseSource
 import kv.kvchat.data.firebase.NetworkingResponse
 
@@ -42,5 +43,5 @@ class UserRepository(private val firebase: FirebaseSource) {
 
     fun updateToken(token: String) = firebase.updateToken(token)
 
-    fun getCurrentToken(): String? = firebase.getCurrentToken()
+    fun getCurrentToken(): MutableLiveData<String> = firebase.getCurrentToken()
 }

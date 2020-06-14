@@ -12,19 +12,19 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import com.google.gson.JsonObject
 import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kv.kvchat.ChatApplication
+import kv.kvchat.R
 import kv.kvchat.data.model.Chat
 import kv.kvchat.data.model.Data
-import kv.kvchat.data.model.User
-import kv.kvchat.R
 import kv.kvchat.data.model.Sender
+import kv.kvchat.data.model.User
 import kv.kvchat.data.network.ApiClient
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,6 +46,8 @@ class FirebaseSource {
     private var imageUploadResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
 
     private var resetPasswordResponse: MutableLiveData<NetworkingResponse> = MutableLiveData()
+
+    private var token: MutableLiveData<String> = MutableLiveData()
 
     private var notify: Boolean = false
 
@@ -415,44 +417,42 @@ class FirebaseSource {
         tokenReference()?.child(ChatApplication.getUser().username ?: "")?.setValue(token)
     }
 
-    fun getCurrentToken(): String? {
-        var newToken: String? = null
+    fun getCurrentToken(): MutableLiveData<String> {
         FirebaseInstanceId.getInstance().instanceId
             .addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
-//                    Log.w(TAG, "getInstanceId failed", task.exception)
                     return@OnCompleteListener
                 }
 
                 // Get new Instance ID token
-                newToken = task.result?.token
+                token.postValue(task.result?.token)
             })
-        return newToken
+        return token
     }
 
-    fun sendNotification(receiver: String, username: String, message: String) {
+    private fun sendNotification(receiver: String, username: String, message: String) {
         val query = tokenReference()?.orderByKey()?.equalTo(receiver)
         query?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (snapshot in dataSnapshot.children) {
-                    val token = snapshot.child("token").value as String
+                    val token = snapshot.value as String
 
                     val data = Data(username, R.mipmap.ic_launcher, message, "", receiver)
                     val sender = Sender(data, token)
 
                     ApiClient.getService().sendNotification(sender)
-                        .enqueue(object : Callback<JSONObject> {
+                        .enqueue(object : Callback<JsonObject> {
                             override fun onResponse(
-                                call: Call<JSONObject>,
-                                response: Response<JSONObject>
+                                call: Call<JsonObject>,
+                                response: Response<JsonObject>
                             ) {
                                 if (response.isSuccessful) {
-                                    Log.d("notif", "success")
+                                    Log.d("notification", "success")
                                 }
                             }
 
-                            override fun onFailure(call: Call<JSONObject>, t: Throwable) {
-                                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                                Log.d("notification", "failed")
                             }
                         })
                 }
