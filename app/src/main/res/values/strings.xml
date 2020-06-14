@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">KVChat</string>
+    <string name="login_title">Account Login</string>
+    <string name="email_title">email</string>
+    <string name="hint_email">example@gmail.com</string>
+    <string name="password_title">password</string>
+    <string name="hint_password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="btn_login">Log in</string>
+    <string name="register">Don\'t have an account? Register here</string>
+    <string name="title_signup">Sign Up</string>
+    <string name="btn_signup">Sign Up</string>
+    <string name="ok_caps">OK</string>
+    <string name="have_an_account">Already have an account? Login here</string>
+    <string name="username_title">username</string>
+    <string name="hint_username">Username</string>
+    <string name="name_title">name</string>
+    <string name="hint_name">Name</string>
+    <string name="profile_title">User Profile</string>
+    <string name="logout">Logout</string>
+    <string name="btn_reset">Reset</string>
+    <string name="info_resetpassword">By clicking RESET, you will receive an email to reset your password</string>
+    <string name="title_resetpassword">Reset Password</string>
+    <string name="hint_message">Type a message...</string>
+    <string name="hint_search">Search...</string>
+    <string name="error_friendsnotfound">Friends not found......sad :(</string>
 </resources>

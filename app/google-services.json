@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "130508281574",
+    "firebase_url": "https://kvchat-275f1.firebaseio.com",
+    "project_id": "kvchat-275f1",
+    "storage_bucket": "kvchat-275f1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:130508281574:android:eeb7ca4e8dd7c950c68d27",
+        "android_client_info": {
+          "package_name": "kv.kvchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "130508281574-rr860hus33kcjnqmo7pditqql5la3nc3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "kv.kvchat",
+            "certificate_hash": "31065a1b8af5a05a32323da4862c06d8817f4440"
+          }
+        },
+        {
+          "client_id": "130508281574-bk4tskbdv2ed6da0rilq2iv86ure52t8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3-eSt1SD6XsnMoMWBdd9ie9WF683uBMc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "130508281574-bk4tskbdv2ed6da0rilq2iv86ure52t8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
